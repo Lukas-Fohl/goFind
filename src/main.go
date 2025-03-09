@@ -25,7 +25,7 @@ type location struct {
 	line    string
 	path    string
 	lineNum int
-	charNum int
+	charNum []int
 }
 
 func defaultSettings() settings {
@@ -98,7 +98,6 @@ func main() {
 
 	switch pathType := dat.Mode(); {
 	case pathType.IsDir():
-		//dir branch
 		err := filepath.Walk(instSettings.path,
 			func(pathIn string, info os.FileInfo, err error) error {
 				if err != nil {
@@ -130,10 +129,18 @@ func main() {
 	}()
 	for msg := range c {
 		if instSettings.checkNormal {
-			fmt.Print("\x1b[1;36m" + msg.path + "\x1b[0m " + strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(msg.charNum), 10) + ":")
+			charIndex := -1
+			if len(msg.charNum) > 0 {
+				charIndex = msg.charNum[0]
+			} else {
+				break
+			}
+			coloredPrinted := 0
+			fmt.Print("\x1b[1;36m" + msg.path + "\x1b[0m " + strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(charIndex), 10) + ":")
 			for i := 0; i < len(msg.line); i++ {
-				if i >= msg.charNum && i < msg.charNum+len(instSettings.searchPattern) {
+				if coloredPrinted < len(msg.charNum) && i == msg.charNum[coloredPrinted] {
 					fmt.Print("\x1b[1;31m" + string(msg.line[i]))
+					coloredPrinted++
 				} else {
 					fmt.Print("\x1b[0m" + string(msg.line[i]))
 				}
@@ -145,7 +152,8 @@ func main() {
 	}
 }
 
-func findExact(line *string, searchPattern string) (bool, int) {
+func findExact(line *string, searchPattern string) (bool, []int) {
+	returnList := []int{}
 	for i := 0; i < len(*line)-len(searchPattern)+1; i++ {
 		searchLength := 0
 		for j := 0; j < len(searchPattern); j++ {
@@ -156,34 +164,39 @@ func findExact(line *string, searchPattern string) (bool, int) {
 			}
 		}
 		if searchLength == len(searchPattern) {
-			return true, i
+			for j := 0; j < len(searchPattern); j++ {
+				returnList = append(returnList, i+j)
+			}
+			return true, returnList
 		}
 	}
-	return false, -1
+	return false, []int{}
 }
 
-func findTextInLine(line *string, settingsIn *settings) (bool, int) {
+func findTextInLine(line *string, settingsIn *settings) (bool, []int) {
 	if settingsIn.checkNormal {
 		found, index := findExact(line, settingsIn.searchPattern)
 		return found, index
 	}
 	if settingsIn.checkLetters {
+		returnList := []int{}
 		charsFound := 0
 		for i := 0; i < len(*line); i++ {
 			if charsFound < len(settingsIn.searchPattern) && (*line)[i] == settingsIn.searchPattern[charsFound] {
 				charsFound++
+				returnList = append(returnList, i)
 			}
 		}
 		if len(settingsIn.searchPattern) == charsFound {
 			//fmt.Println(*line)
-			return true, -1
+			return true, returnList
 		}
 	}
 	if settingsIn.checkFuzzy {
-		return false, -1
+		return false, []int{}
 	}
 
-	return false, -1
+	return false, []int{}
 }
 
 func findTextInFile(pathIn string, settingsIn settings, c chan location, wg *sync.WaitGroup) {
@@ -235,5 +248,4 @@ TODO:
 	split file into: main, search, output
 	write docs
 	build test
-
 */
