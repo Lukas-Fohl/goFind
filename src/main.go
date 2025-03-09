@@ -48,19 +48,16 @@ func main() {
 
 	if len(args) < 2 {
 		panic("not enougth arguments")
-	} else if len(args) == 2 {
-		instSettings.searchPattern = args[1]
+	} else {
 		pathOut, err := os.Getwd()
 		if err != nil {
 			panic(err)
 		}
 		instSettings.path = pathOut
-	} else {
-		instSettings.path = args[1]
-		instSettings.searchPattern = args[2]
+		instSettings.searchPattern = args[1]
 	}
 
-	for i := 3; i < len(args) && len(args) > 3; i++ {
+	for i := 2; i < len(args) && len(args) > 2; i++ {
 		switch args[i] {
 		case "-i":
 			instSettings.checkNormal = false
@@ -81,7 +78,12 @@ func main() {
 				panic("no size provided for depth")
 			}
 		default:
-			panic("flag not found")
+			if i == 2 {
+				instSettings.path = args[1]
+				instSettings.searchPattern = args[2]
+			} else {
+				panic("flag not found")
+			}
 		}
 	}
 
@@ -123,32 +125,40 @@ func main() {
 		wg.Add(1)
 		go findTextInFile(instSettings.path, instSettings, c, &wg)
 	}
+
 	go func() {
 		wg.Wait()
 		close(c)
 	}()
+
 	for msg := range c {
-		if instSettings.checkNormal {
-			charIndex := -1
-			if len(msg.charNum) > 0 {
-				charIndex = msg.charNum[0]
-			} else {
-				break
-			}
-			coloredPrinted := 0
-			fmt.Print("\x1b[1;36m" + msg.path + "\x1b[0m " + strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(charIndex), 10) + ":")
-			for i := 0; i < len(msg.line); i++ {
-				if coloredPrinted < len(msg.charNum) && i == msg.charNum[coloredPrinted] {
-					fmt.Print("\x1b[1;31m" + string(msg.line[i]))
-					coloredPrinted++
-				} else {
-					fmt.Print("\x1b[0m" + string(msg.line[i]))
-				}
-			}
-			fmt.Print("\x1b[0m\n")
+		charIndex := -1
+		if len(msg.charNum) > 0 {
+			charIndex = msg.charNum[0]
 		} else {
-			fmt.Println(msg.path + " " + strconv.FormatInt(int64(msg.lineNum), 10) + ":" + msg.line)
+			break
 		}
+		newPath, err := filepath.Abs(msg.path)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Print("\x1b[1;36m" + newPath + "\x1b[0m:")
+		if instSettings.checkNormal {
+			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(charIndex), 10))
+		} else {
+			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10))
+		}
+		fmt.Print(":")
+		coloredPrinted := 0
+		for i := 0; i < len(msg.line); i++ {
+			if coloredPrinted < len(msg.charNum) && i == msg.charNum[coloredPrinted] {
+				fmt.Print("\x1b[1;31m" + string(msg.line[i]))
+				coloredPrinted++
+			} else {
+				fmt.Print("\x1b[0m" + string(msg.line[i]))
+			}
+		}
+		fmt.Print("\x1b[0m\n")
 	}
 }
 
@@ -248,4 +258,5 @@ TODO:
 	split file into: main, search, output
 	write docs
 	build test
+	check for binary file
 */
