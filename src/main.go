@@ -16,6 +16,7 @@ type settings struct {
 	checkLetters   bool
 	checkFuzzy     bool
 	checkNormal    bool
+	checkFileName  bool
 	path           string
 	pathDepth      int
 	searchPattern  string
@@ -35,14 +36,14 @@ func defaultSettings() settings {
 		checkLetters:   false,
 		checkFuzzy:     false,
 		checkNormal:    true,
+		checkFileName:  false,
 		pathDepth:      0,
 		path:           "",
 		searchPattern:  "",
 	}
 }
 
-func main() {
-	args := os.Args
+func flagHandle(args []string) settings {
 
 	instSettings := defaultSettings()
 
@@ -65,6 +66,8 @@ func main() {
 		case "-c":
 			instSettings.checkNormal = false
 			instSettings.checkFuzzy = true
+		case "-f":
+			instSettings.checkFileName = true
 		case "-l":
 			instSettings.levelRest = true
 			if i < len(args)-1 {
@@ -88,50 +91,8 @@ func main() {
 	}
 
 	instSettings.pathDepth = strings.Count(path.Join(instSettings.path), string(os.PathSeparator))
-	//fmt.Println(instSettings)
 
-	dat, err := os.Stat(instSettings.path)
-	if err != nil {
-		panic(err)
-	}
-
-	c := make(chan location)
-	var wg sync.WaitGroup
-
-	switch pathType := dat.Mode(); {
-	case pathType.IsDir():
-		err := filepath.Walk(instSettings.path,
-			func(pathIn string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				stat, err := os.Stat(pathIn)
-				if err == nil {
-					if (stat.Mode()&0111) == 0 && !stat.IsDir() {
-						currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.pathDepth - 1
-						if (instSettings.levelRest && currentPathDepth <= instSettings.levelRestLimit) || !instSettings.levelRest {
-							wg.Add(1)
-							go findTextInFile(pathIn, instSettings, c, &wg)
-						}
-					}
-				}
-				return nil
-			})
-		if err != nil {
-			panic(err)
-		}
-
-	case pathType.IsRegular():
-		wg.Add(1)
-		go findTextInFile(instSettings.path, instSettings, c, &wg)
-	}
-
-	go func() {
-		wg.Wait()
-		close(c)
-	}()
-
-	printResult(c, instSettings)
+	return instSettings
 }
 
 func printResult(c chan location, instSettings settings) {
@@ -166,93 +127,51 @@ func printResult(c chan location, instSettings settings) {
 	}
 }
 
-func findExact(line *string, searchPattern string) (bool, []int) {
-	returnList := []int{}
-	for i := 0; i < len(*line)-len(searchPattern)+1; i++ {
-		searchLength := 0
-		for j := 0; j < len(searchPattern); j++ {
-			if (*line)[i+j] != searchPattern[j] {
-				break
-			} else {
-				searchLength++
-			}
-		}
-		if searchLength == len(searchPattern) {
-			for j := 0; j < len(searchPattern); j++ {
-				returnList = append(returnList, i+j)
-			}
-			return true, returnList
-		}
-	}
-	return false, []int{}
-}
+func main() {
+	instSettings := flagHandle(os.Args)
 
-func findChars(line *string, searchPattern string) (bool, []int) {
-	returnList := []int{}
-	charsFound := 0
-	for i := 0; i < len(*line); i++ {
-		if charsFound < len(searchPattern) && (*line)[i] == searchPattern[charsFound] {
-			charsFound++
-			returnList = append(returnList, i)
-		}
-	}
-	if len(searchPattern) == charsFound {
-		return true, returnList
-	}
-	return false, []int{}
-}
-
-func findFuzzy(line *string, searchPattern string) (bool, []int) {
-	for i := 0; i < len(searchPattern); i++ {
-		found, idxs := findChars(line, searchPattern)
-		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
-			return found, idxs
-		}
-	}
-
-	for i := 0; i < len(searchPattern); i++ {
-		newSearch := searchPattern[:i] + searchPattern[i+1:]
-		found, idxs := findChars(line, newSearch)
-		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
-			return found, idxs
-		}
-	}
-	return false, []int{}
-}
-
-func findTextInLine(line *string, settingsIn *settings) (bool, []int) {
-	if settingsIn.checkNormal {
-		found, index := findExact(line, settingsIn.searchPattern)
-		return found, index
-	}
-
-	if settingsIn.checkLetters {
-		found, index := findChars(line, settingsIn.searchPattern)
-		return found, index
-	}
-
-	if settingsIn.checkFuzzy {
-		found, index := findFuzzy(line, settingsIn.searchPattern)
-		return found, index
-	}
-
-	return false, []int{}
-}
-
-func findTextInFile(pathIn string, settingsIn settings, c chan location, wg *sync.WaitGroup) {
-	defer wg.Done()
-	//fmt.Println(pathIn)
-	dat, err := os.ReadFile(pathIn)
+	dat, err := os.Stat(instSettings.path)
 	if err != nil {
 		panic(err)
 	}
-	fileLines := strings.Split(string(dat), "\n")
-	for i := 0; i < len(fileLines); i++ {
-		found, index := findTextInLine(&(fileLines[i]), &settingsIn)
-		if found {
-			c <- location{path: pathIn, line: fileLines[i], lineNum: i, charNum: index}
+
+	c := make(chan location)
+	var wg sync.WaitGroup
+
+	switch pathType := dat.Mode(); {
+	case pathType.IsDir():
+		err := filepath.Walk(instSettings.path,
+			func(pathIn string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				stat, err := os.Stat(pathIn)
+				if err == nil {
+					if (stat.Mode()&0111) == 0 && !stat.IsDir() {
+						currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.pathDepth - 1
+						if (instSettings.levelRest && currentPathDepth <= instSettings.levelRestLimit) || !instSettings.levelRest {
+							wg.Add(1)
+							go FindTextInFile(pathIn, instSettings, c, &wg)
+						}
+					}
+				}
+				return nil
+			})
+		if err != nil {
+			panic(err)
 		}
+
+	case pathType.IsRegular():
+		wg.Add(1)
+		go FindTextInFile(instSettings.path, instSettings, c, &wg)
 	}
+
+	go func() {
+		wg.Wait()
+		close(c)
+	}()
+
+	printResult(c, instSettings)
 }
 
 /*
@@ -278,6 +197,8 @@ fuzzy requirements:
   - flags:
     - "-l":
       - level depth of file tree search [x]
+	- "-f"
+	  - check file name
     - "-i":
       - check if letters in line [x]
     - "-c":
