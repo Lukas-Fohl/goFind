@@ -1,7 +1,6 @@
-package main
+package finder
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,7 +9,7 @@ import (
 	"sync"
 )
 
-type settings struct {
+type Settings struct {
 	levelRest      bool //level restriction
 	levelRestLimit int  //value for ^
 	checkLetters   bool
@@ -22,15 +21,15 @@ type settings struct {
 	searchPattern  string
 }
 
-type location struct {
+type Loaction struct {
 	line    string
 	path    string
 	lineNum int
 	charNum []int
 }
 
-func defaultSettings() settings {
-	return settings{
+func DefaultSettings() Settings {
+	return Settings{
 		levelRest:      false,
 		levelRestLimit: -1,
 		checkLetters:   false,
@@ -43,9 +42,9 @@ func defaultSettings() settings {
 	}
 }
 
-func flagHandle(args []string) settings {
+func FlagHandle(args []string) Settings {
 
-	instSettings := defaultSettings()
+	instSettings := DefaultSettings()
 
 	if len(args) < 2 {
 		panic("not enougth arguments")
@@ -95,47 +94,15 @@ func flagHandle(args []string) settings {
 	return instSettings
 }
 
-func printResult(c chan location, instSettings settings) {
-	for msg := range c {
-		charIndex := -1
-		if len(msg.charNum) > 0 {
-			charIndex = msg.charNum[0]
-		} else {
-			break
-		}
-		newPath, err := filepath.Abs(msg.path)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Print("\x1b[1;36m" + newPath + "\x1b[0m:")
-		if instSettings.checkNormal {
-			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(charIndex), 10))
-		} else {
-			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10))
-		}
-		fmt.Print(":")
-		coloredPrinted := 0
-		for i := 0; i < len(msg.line); i++ {
-			if coloredPrinted < len(msg.charNum) && i == msg.charNum[coloredPrinted] {
-				fmt.Print("\x1b[1;31m" + string(msg.line[i]))
-				coloredPrinted++
-			} else {
-				fmt.Print("\x1b[0m" + string(msg.line[i]))
-			}
-		}
-		fmt.Print("\x1b[0m\n")
-	}
-}
-
-func main() {
-	instSettings := flagHandle(os.Args)
+func MainCall() {
+	instSettings := FlagHandle(os.Args)
 
 	dat, err := os.Stat(instSettings.path)
 	if err != nil {
 		panic(err)
 	}
 
-	c := make(chan location)
+	c := make(chan Loaction)
 	var wg sync.WaitGroup
 
 	switch pathType := dat.Mode(); {
@@ -171,44 +138,5 @@ func main() {
 		close(c)
 	}()
 
-	printResult(c, instSettings)
+	PrintResult(c, instSettings)
 }
-
-/*
-fuzzy requirements:
-  - string as input
-  - search files in child direcotries for lines with input in them
-  - input not exact -> have same order of letters
-  - sort out input for flags and text
-  - how TO:
-    - input:
-      - "path" -> check if is path or file
-    - get file tree
-    - spawn thread for each file
-    - search file:
-      - look at each line -> look for first char -> for second in rest ...
-      - if found send back in channel
-    - return "nice" output for each found line (including file and number)
-
-  - test (in python?):
-    - for each flag
-    - for an big file
-
-  - flags:
-    - "-l":
-      - level depth of file tree search [x]
-	- "-f"
-	  - check file name
-    - "-i":
-      - check if letters in line [x]
-    - "-c":
-      - input can have 1 letter changed (missing, added, different)
-
-TODO:
-	[x] impl fuzzy
-    impl file name search
-	split file into: main, search, output
-	write docs
-	build test
-	check for binary file
-*/

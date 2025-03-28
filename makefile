@@ -1,6 +1,6 @@
 comp = go
-buildPath = ../build
-inputFile = ./*.go
+buildPath = ./build
+inputFile = ./main.go
 
 build:
 	@if [ ! -d $(buildPath) ]; then\

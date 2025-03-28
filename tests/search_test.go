@@ -1,13 +1,10 @@
 package tests
 
 import (
+	finder "finder/search"
 	"math/rand/v2"
 	"testing"
-
-	main "github.com/lukas-fohl/goFind/src"
 )
-
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func randomString(l int) string {
 	min := 65
@@ -23,12 +20,19 @@ func TestFindTextInLine(t *testing.T) {
 	len := 20
 	sta := 5
 	end := 15
+	prefix := "error in FindTextInLine - "
 	testString := randomString(len)
-	found, idxs := main.FindExact(&testString, testString[sta:end])
+	idxs := []int{}
+	found := false
+	found, idxs = finder.FindExact(&testString, testString[sta:end])
 	if !found {
-		t.Error("error in FindTextInLine")
+		t.Error(prefix + "not found")
+	} else {
+		if len(idxs) != end-sta {
+			t.Error(prefix + "wrong length")
+		}
 	}
-	if len(idxs) != end-sta {
-		t.Error("error in FindTextInLine arg len")
+	if idxs[0]-idxs[len(idxs)-1] != end-sta {
+		t.Error(prefix + "wrong chars found")
 	}
 }

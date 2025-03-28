@@ -1,4 +1,4 @@
-package main
+package finder
 
 import (
 	"os"
@@ -60,26 +60,26 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
-func FindTextInLine(line *string, settingsIn *settings) (bool, []int) {
-	if settingsIn.checkNormal {
-		found, index := FindExact(line, settingsIn.searchPattern)
+func FindTextInLine(line *string, SettingsIn *Settings) (bool, []int) {
+	if SettingsIn.checkNormal {
+		found, index := FindExact(line, SettingsIn.searchPattern)
 		return found, index
 	}
 
-	if settingsIn.checkLetters {
-		found, index := FindChars(line, settingsIn.searchPattern)
+	if SettingsIn.checkLetters {
+		found, index := FindChars(line, SettingsIn.searchPattern)
 		return found, index
 	}
 
-	if settingsIn.checkFuzzy {
-		found, index := FindFuzzy(line, settingsIn.searchPattern)
+	if SettingsIn.checkFuzzy {
+		found, index := FindFuzzy(line, SettingsIn.searchPattern)
 		return found, index
 	}
 
 	return false, []int{}
 }
 
-func FindTextInFile(pathIn string, settingsIn settings, c chan location, wg *sync.WaitGroup) {
+func FindTextInFile(pathIn string, SettingsIn Settings, c chan Loaction, wg *sync.WaitGroup) {
 	defer wg.Done()
 	//fmt.Println(pathIn)
 	dat, err := os.ReadFile(pathIn)
@@ -88,9 +88,9 @@ func FindTextInFile(pathIn string, settingsIn settings, c chan location, wg *syn
 	}
 	fileLines := strings.Split(string(dat), "\n")
 	for i := 0; i < len(fileLines); i++ {
-		found, index := FindTextInLine(&(fileLines[i]), &settingsIn)
+		found, index := FindTextInLine(&(fileLines[i]), &SettingsIn)
 		if found {
-			c <- location{path: pathIn, line: fileLines[i], lineNum: i, charNum: index}
+			c <- Loaction{path: pathIn, line: fileLines[i], lineNum: i, charNum: index}
 		}
 	}
 }
