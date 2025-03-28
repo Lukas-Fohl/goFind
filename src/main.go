@@ -131,6 +131,10 @@ func main() {
 		close(c)
 	}()
 
+	printResult(c, instSettings)
+}
+
+func printResult(c chan location, instSettings settings) {
 	for msg := range c {
 		charIndex := -1
 		if len(msg.charNum) > 0 {
@@ -183,27 +187,53 @@ func findExact(line *string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
+func findChars(line *string, searchPattern string) (bool, []int) {
+	returnList := []int{}
+	charsFound := 0
+	for i := 0; i < len(*line); i++ {
+		if charsFound < len(searchPattern) && (*line)[i] == searchPattern[charsFound] {
+			charsFound++
+			returnList = append(returnList, i)
+		}
+	}
+	if len(searchPattern) == charsFound {
+		return true, returnList
+	}
+	return false, []int{}
+}
+
+func findFuzzy(line *string, searchPattern string) (bool, []int) {
+	for i := 0; i < len(searchPattern); i++ {
+		found, idxs := findChars(line, searchPattern)
+		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
+			return found, idxs
+		}
+	}
+
+	for i := 0; i < len(searchPattern); i++ {
+		newSearch := searchPattern[:i] + searchPattern[i+1:]
+		found, idxs := findChars(line, newSearch)
+		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
+			return found, idxs
+		}
+	}
+	return false, []int{}
+}
+
 func findTextInLine(line *string, settingsIn *settings) (bool, []int) {
 	if settingsIn.checkNormal {
 		found, index := findExact(line, settingsIn.searchPattern)
 		return found, index
 	}
+
 	if settingsIn.checkLetters {
-		returnList := []int{}
-		charsFound := 0
-		for i := 0; i < len(*line); i++ {
-			if charsFound < len(settingsIn.searchPattern) && (*line)[i] == settingsIn.searchPattern[charsFound] {
-				charsFound++
-				returnList = append(returnList, i)
-			}
-		}
-		if len(settingsIn.searchPattern) == charsFound {
-			//fmt.Println(*line)
-			return true, returnList
-		}
+		found, index := findChars(line, settingsIn.searchPattern)
+		return found, index
 	}
+
 	if settingsIn.checkFuzzy {
-		return false, []int{}
+		found, index := findFuzzy(line, settingsIn.searchPattern)
+		return found, index
 	}
 
 	return false, []int{}
@@ -254,7 +284,8 @@ fuzzy requirements:
       - input can have 1 letter changed (missing, added, different)
 
 TODO:
-	impl fuzzy
+	[x] impl fuzzy
+    impl file name search
 	split file into: main, search, output
 	write docs
 	build test

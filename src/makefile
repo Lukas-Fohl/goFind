@@ -10,4 +10,4 @@ build:
 
 run:
 	$(MAKE) build
-	$(buildPath)/main "/home/lukas/code/td/" "package" -l 1
+	$(buildPath)/main "/home/lukas/code/td/" "packuge" -l 1 -c
