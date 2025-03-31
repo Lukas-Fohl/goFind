@@ -14,11 +14,11 @@ func PrintResult(c chan Loaction, instSettings Settings) {
 		} else {
 			break
 		}
-		newPath, err := filepath.Abs(msg.path)
+		absPath, err := filepath.Abs(msg.path)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Print("\x1b[1;36m" + newPath + "\x1b[0m:")
+		fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
 		if instSettings.checkNormal {
 			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(charIndex), 10))
 		} else {

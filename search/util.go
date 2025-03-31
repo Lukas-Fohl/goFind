@@ -89,6 +89,12 @@ func FlagHandle(args []string) Settings {
 		}
 	}
 
+	absPath, err := filepath.Abs(instSettings.path)
+	if err != nil {
+		panic(err)
+	}
+
+	instSettings.path = absPath
 	instSettings.pathDepth = strings.Count(path.Join(instSettings.path), string(os.PathSeparator))
 
 	return instSettings

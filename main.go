@@ -8,23 +8,15 @@ func main() {
 
 /*
 fuzzy requirements:
-  - string as input
-  - search files in child direcotries for lines with input in them
-  - input not exact -> have same order of letters
-  - sort out input for flags and text
-  - how TO:
-    - input:
-      - "path" -> check if is path or file
-    - get file tree
-    - spawn thread for each file
-    - search file:
-      - look at each line -> look for first char -> for second in rest ...
-      - if found send back in channel
-    - return "nice" output for each found line (including file and number)
-
-  - test (in python?):
+  - test:
     - for each flag
-    - for an big file
+    - for flag behav
+
+  - write docs
+    - main readme with examples
+      - installation
+    - comments for functions
+    - examples on how to use
 
   - flags:
     - "-l":
@@ -38,9 +30,10 @@ fuzzy requirements:
 
 TODO:
 	[x] impl fuzzy
-    impl file name search
-	split file into: main, search, output
+  impl file name search
+	[x] split file into: main, search, output
 	write docs
-	build test
+	[x] build test
 	check for binary file
+  other stuff
 */
