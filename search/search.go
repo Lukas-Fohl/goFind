@@ -7,6 +7,10 @@ import (
 )
 
 func FindExact(line *string, searchPattern string) (bool, []int) {
+	if line == nil || len(*line) == 0 || len(searchPattern) == 0 {
+		return false, []int{}
+	}
+
 	returnList := []int{}
 	for i := 0; i < len(*line)-len(searchPattern)+1; i++ {
 		searchLength := 0
@@ -28,6 +32,10 @@ func FindExact(line *string, searchPattern string) (bool, []int) {
 }
 
 func FindChars(line *string, searchPattern string) (bool, []int) {
+	if line == nil || len(*line) == 0 || len(searchPattern) == 0 {
+		return false, []int{}
+	}
+
 	returnList := []int{}
 	charsFound := 0
 	for i := 0; i < len(*line); i++ {
@@ -43,6 +51,10 @@ func FindChars(line *string, searchPattern string) (bool, []int) {
 }
 
 func FindFuzzy(line *string, searchPattern string) (bool, []int) {
+	if line == nil || len(*line) == 0 || len(searchPattern) == 0 {
+		return false, []int{}
+	}
+
 	for i := 0; i < len(searchPattern); i++ {
 		found, idxs := FindChars(line, searchPattern)
 		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
