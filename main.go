@@ -12,9 +12,10 @@ fuzzy requirements:
     - file name [x]
     - fix fuzzy char index [x]
     - fix indices name to indices [x]
-    - get input from buffer (some | goFind "test")
+    - get input from buffer (some | goFind "test") [x]
     - get amount in file
     - no info output [x]
+    - rewrite output
 
   - test:
     - for each flag

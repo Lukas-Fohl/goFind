@@ -24,17 +24,19 @@ func PrintResult(c chan Location, instSettings Settings) {
 			panic(err)
 		}
 
-		fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
-		if instSettings.CheckNormal {
-			if !instSettings.CheckFileName {
-				fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + ",")
+		if !instSettings.PipeInput {
+			fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
+			if instSettings.CheckNormal {
+				if !instSettings.CheckFileName {
+					fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + ",")
+				}
+				fmt.Print(strconv.FormatInt(int64(charIndex), 10))
+			} else {
+				fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10))
 			}
-			fmt.Print(strconv.FormatInt(int64(charIndex), 10))
-		} else {
-			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10))
+			fmt.Print(":")
 		}
 
-		fmt.Print(":")
 		coloredPrinted := 0
 		for i := 0; i < len(msg.line); i++ {
 			if coloredPrinted < len(msg.charNum) && i == msg.charNum[coloredPrinted] {

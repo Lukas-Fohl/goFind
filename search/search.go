@@ -103,6 +103,22 @@ func FindTextInLine(line *string, SettingsIn *Settings) (bool, []int) {
 	return false, []int{}
 }
 
+func FindTextInBuff(buffIn *string, settingsIn Settings, c chan Location, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	if !utf8.ValidString(*buffIn) {
+		return
+	}
+
+	fileLines := strings.Split(string(*buffIn), "\n") //get lines
+	for i, lineIter := range fileLines {
+		found, index := FindTextInLine(&lineIter, &settingsIn)
+		if found {
+			c <- Location{path: "", line: lineIter, lineNum: i, charNum: index}
+		}
+	}
+}
+
 func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *sync.WaitGroup) {
 	defer wg.Done()
 

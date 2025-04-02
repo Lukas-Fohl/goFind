@@ -1,12 +1,14 @@
 package finder
 
 import (
+	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 )
 
 type Settings struct {
@@ -17,6 +19,7 @@ type Settings struct {
 	CheckNormal    bool
 	CheckFileName  bool
 	ShowInfo       bool
+	PipeInput      bool
 	Path           string
 	PathDepth      int
 	SearchPattern  string
@@ -38,6 +41,7 @@ func DefaultSettings() Settings {
 		CheckNormal:    true,
 		CheckFileName:  false,
 		ShowInfo:       true,
+		PipeInput:      false,
 		PathDepth:      0,
 		Path:           "",
 		SearchPattern:  "",
@@ -45,7 +49,6 @@ func DefaultSettings() Settings {
 }
 
 func FlagHandle(args []string) Settings {
-
 	instSettings := DefaultSettings()
 
 	if len(args) < 2 {
@@ -110,42 +113,64 @@ func FlagHandle(args []string) Settings {
 func Start() {
 	instSettings := FlagHandle(os.Args)
 
-	dat, err := os.Stat(instSettings.Path)
+	var pipe string
+	fi, err := os.Stdin.Stat()
 	if err != nil {
 		panic(err)
+	}
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		n, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			panic(err)
+		}
+		if !utf8.ValidString(string(n)) {
+			panic("pipe input not valid utf8")
+		}
+		instSettings.PipeInput = true
+		pipe = string(n)
 	}
 
 	c := make(chan Location)
 	var wg sync.WaitGroup
 
-	switch pathType := dat.Mode(); {
-	case pathType.IsDir():
-		err := filepath.Walk(instSettings.Path,
-			func(pathIn string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-
-				stat, err := os.Stat(pathIn)
-				if err == nil {
-					if ((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir() { //check if path is file and not executable
-						currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.PathDepth - 1
-						if (instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest {
-							wg.Add(1)
-							go FindTextInFile(pathIn, instSettings, c, &wg)
-						}
-					}
-				}
-				return nil
-			})
-
+	if instSettings.PipeInput {
+		wg.Add(1)
+		go FindTextInBuff(&pipe, instSettings, c, &wg)
+	} else {
+		dat, err := os.Stat(instSettings.Path)
 		if err != nil {
 			panic(err)
 		}
 
-	case pathType.IsRegular():
-		wg.Add(1)
-		go FindTextInFile(instSettings.Path, instSettings, c, &wg)
+		switch pathType := dat.Mode(); {
+		case pathType.IsDir():
+			err := filepath.Walk(instSettings.Path,
+				func(pathIn string, info os.FileInfo, err error) error {
+					if err != nil {
+						return err
+					}
+
+					stat, err := os.Stat(pathIn)
+					if err == nil {
+						if ((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir() { //check if path is file and not executable
+							currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.PathDepth - 1
+							if (instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest {
+								wg.Add(1)
+								go FindTextInFile(pathIn, instSettings, c, &wg)
+							}
+						}
+					}
+					return nil
+				})
+
+			if err != nil {
+				panic(err)
+			}
+
+		case pathType.IsRegular():
+			wg.Add(1)
+			go FindTextInFile(instSettings.Path, instSettings, c, &wg)
+		}
 	}
 
 	go func() {
