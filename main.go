@@ -3,13 +3,23 @@ package main
 import finder "finder/search"
 
 func main() {
-	finder.MainCall()
+	finder.Start()
 }
 
 /*
 fuzzy requirements:
+  -new feats:
+    - file name [x]
+    - fix fuzzy char index
+    - fix idxs name to indices
+    - get input from buffer (some | goFind "test")
+    - no color
+    - get amount in file
+    - no info output
+
   - test:
     - for each flag
+    - check flag function behav with sameples
     - for flag behav
 
   - write docs
@@ -21,19 +31,20 @@ fuzzy requirements:
   - flags:
     - "-l":
       - level depth of file tree search [x]
-	- "-f"
-	  - check file name
+	  - "-f"
+	    - check file name
     - "-i":
       - check if letters in line [x]
     - "-c":
-      - input can have 1 letter changed (missing, added, different)
+      - input can have 1 letter changed (missing, added, different) [x]
 
 TODO:
 	[x] impl fuzzy
-  impl file name search
+  [x]impl file name search
 	[x] split file into: main, search, output
 	write docs
 	[x] build test
-	check for binary file
+	[x] check for binary file
   other stuff
+  change flags???
 */

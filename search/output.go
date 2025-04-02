@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func PrintResult(c chan Loaction, instSettings Settings) {
+func PrintResult(c chan Location, instSettings Settings) {
 	for msg := range c {
 		charIndex := -1
 		if len(msg.charNum) > 0 {
@@ -14,16 +14,22 @@ func PrintResult(c chan Loaction, instSettings Settings) {
 		} else {
 			break
 		}
+
 		absPath, err := filepath.Abs(msg.path)
 		if err != nil {
 			panic(err)
 		}
+
 		fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
-		if instSettings.checkNormal {
-			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + "," + strconv.FormatInt(int64(charIndex), 10))
+		if instSettings.CheckNormal {
+			if !instSettings.CheckFileName {
+				fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10) + ",")
+			}
+			fmt.Print(strconv.FormatInt(int64(charIndex), 10))
 		} else {
 			fmt.Print(strconv.FormatInt(int64(msg.lineNum), 10))
 		}
+
 		fmt.Print(":")
 		coloredPrinted := 0
 		for i := 0; i < len(msg.line); i++ {
@@ -34,6 +40,7 @@ func PrintResult(c chan Loaction, instSettings Settings) {
 				fmt.Print("\x1b[0m" + string(msg.line[i]))
 			}
 		}
+
 		fmt.Print("\x1b[0m\n")
 	}
 }

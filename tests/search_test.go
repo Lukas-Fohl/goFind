@@ -128,6 +128,27 @@ func TestFindFuzzy(t *testing.T) {
 			wantFind: false,
 			wantLen:  0,
 		},
+		{
+			name:     "no match",
+			text:     "ABCFFDEF",
+			pattern:  "ABCDEF",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "no match",
+			text:     "ABCEF",
+			pattern:  "ABCDEF",
+			wantFind: true,
+			wantLen:  5,
+		},
+		{
+			name:     "no match",
+			text:     "ABCDEF",
+			pattern:  "ABCEF",
+			wantFind: true,
+			wantLen:  4,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
