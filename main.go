@@ -10,17 +10,15 @@ func main() {
 fuzzy requirements:
   -new feats:
     - file name [x]
-    - fix fuzzy char index
-    - fix idxs name to indices
+    - fix fuzzy char index [x]
+    - fix indices name to indices [x]
     - get input from buffer (some | goFind "test")
-    - no color
     - get amount in file
-    - no info output
+    - no info output [x]
 
   - test:
     - for each flag
     - check flag function behav with sameples
-    - for flag behav
 
   - write docs
     - main readme with examples
@@ -37,6 +35,8 @@ fuzzy requirements:
       - check if letters in line [x]
     - "-c":
       - input can have 1 letter changed (missing, added, different) [x]
+    - "-n":
+      - no info in output, just the line
 
 TODO:
 	[x] impl fuzzy

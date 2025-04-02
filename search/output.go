@@ -8,6 +8,10 @@ import (
 
 func PrintResult(c chan Location, instSettings Settings) {
 	for msg := range c {
+		if !instSettings.ShowInfo {
+			fmt.Println(msg.line)
+			continue
+		}
 		charIndex := -1
 		if len(msg.charNum) > 0 {
 			charIndex = msg.charNum[0]

@@ -16,6 +16,7 @@ type Settings struct {
 	CheckFuzzy     bool
 	CheckNormal    bool
 	CheckFileName  bool
+	ShowInfo       bool
 	Path           string
 	PathDepth      int
 	SearchPattern  string
@@ -36,6 +37,7 @@ func DefaultSettings() Settings {
 		CheckFuzzy:     false,
 		CheckNormal:    true,
 		CheckFileName:  false,
+		ShowInfo:       true,
 		PathDepth:      0,
 		Path:           "",
 		SearchPattern:  "",
@@ -69,6 +71,8 @@ func FlagHandle(args []string) Settings {
 			instSettings.CheckFuzzy = true
 		case "-f":
 			instSettings.CheckFileName = true
+		case "-n":
+			instSettings.ShowInfo = false
 		case "-l":
 			instSettings.LevelRest = true
 			if i < len(args)-1 {

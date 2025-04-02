@@ -51,18 +51,18 @@ func TestFindExact(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, idxs := finder.FindExact(&tc.text, tc.pattern)
+			found, indices := finder.FindExact(&tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
-			if len(idxs) != tc.wantLen {
-				t.Errorf("got %d indices, want %d", len(idxs), tc.wantLen)
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
 			}
 			if found {
 				// Check if indices are sequential
-				for i := 1; i < len(idxs); i++ {
-					if idxs[i] != idxs[i-1]+1 {
-						t.Errorf("indices not sequential: %v", idxs)
+				for i := 1; i < len(indices); i++ {
+					if indices[i] != indices[i-1]+1 {
+						t.Errorf("indices not sequential: %v", indices)
 					}
 				}
 			}
@@ -95,12 +95,12 @@ func TestFindChars(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, idxs := finder.FindChars(&tc.text, tc.pattern)
+			found, indices := finder.FindChars(&tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
-			if len(idxs) != tc.wantLen {
-				t.Errorf("got %d indices, want %d", len(idxs), tc.wantLen)
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
 			}
 		})
 	}
@@ -122,42 +122,42 @@ func TestFindFuzzy(t *testing.T) {
 			wantLen:  6,
 		},
 		{
-			name:     "no match",
+			name:     "no match bigger patten",
 			text:     "ABCDEF",
 			pattern:  "ABFFDEF",
 			wantFind: false,
 			wantLen:  0,
 		},
 		{
-			name:     "no match",
+			name:     "no match bigger text",
 			text:     "ABCFFDEF",
 			pattern:  "ABCDEF",
 			wantFind: false,
 			wantLen:  0,
 		},
 		{
-			name:     "no match",
+			name:     "full match",
 			text:     "ABCEF",
 			pattern:  "ABCDEF",
 			wantFind: true,
 			wantLen:  5,
 		},
 		{
-			name:     "no match",
+			name:     "missing match",
 			text:     "ABCDEF",
 			pattern:  "ABCEF",
 			wantFind: true,
-			wantLen:  4,
+			wantLen:  5,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, idxs := finder.FindFuzzy(&tc.text, tc.pattern)
+			found, indices := finder.FindFuzzy(&tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
-			if len(idxs) != tc.wantLen {
-				t.Errorf("got %d indices, want %d", len(idxs), tc.wantLen)
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
 			}
 		})
 	}
@@ -196,12 +196,12 @@ func TestFindExactProp(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, idxs := finder.FindExact(&tc.text, tc.pattern)
+			found, indices := finder.FindExact(&tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
-			if len(idxs) != tc.wantLen {
-				t.Errorf("got %d indices, want %d", len(idxs), tc.wantLen)
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
 			}
 		})
 	}
@@ -235,12 +235,12 @@ func TestFindFuzzyProp(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, idxs := finder.FindFuzzy(&tc.text, tc.pattern)
+			found, indices := finder.FindFuzzy(&tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
-			if len(idxs) != tc.wantLen {
-				t.Errorf("got %d indices, want %d", len(idxs), tc.wantLen)
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
 			}
 		})
 	}

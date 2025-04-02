@@ -65,18 +65,18 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 
 	//search with one char added somewhere
 	for i := 0; i < len(searchPattern); i++ {
-		found, idxs := FindChars(line, searchPattern)
-		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
-			return found, idxs
+		found, indices := FindChars(line, searchPattern)
+		if found && indices[len(indices)-1]-indices[0] <= len(searchPattern) {
+			return found, indices
 		}
 	}
 
 	//search pattern with each char missing -> one wrong char or one missing
 	for i := 0; i < len(searchPattern); i++ {
 		newSearch := searchPattern[:i] + searchPattern[i+1:]
-		found, idxs := FindChars(line, newSearch)
-		if found && idxs[len(idxs)-1]-idxs[0] < len(searchPattern) {
-			return found, idxs
+		found, indices := FindChars(line, newSearch)
+		if found && indices[len(indices)-1]-indices[0] < len(searchPattern) {
+			return found, indices
 		}
 	}
 

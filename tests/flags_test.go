@@ -60,6 +60,7 @@ func TestFlag(t *testing.T) {
 				CheckFuzzy:     true,  //-c
 				CheckNormal:    false,
 				CheckFileName:  false, //-f
+				ShowInfo:       true,  //-n
 				PathDepth:      0,
 				Path:           "",
 				SearchPattern:  "",
@@ -75,6 +76,7 @@ func TestFlag(t *testing.T) {
 				CheckFuzzy:     false, //-c
 				CheckNormal:    true,
 				CheckFileName:  false, //-f
+				ShowInfo:       true,  //-n
 				PathDepth:      0,
 				Path:           "",
 				SearchPattern:  "",
@@ -90,6 +92,7 @@ func TestFlag(t *testing.T) {
 				CheckFuzzy:     false, //-c
 				CheckNormal:    false,
 				CheckFileName:  false, //-f
+				ShowInfo:       true,  //-n
 				PathDepth:      0,
 				Path:           "",
 				SearchPattern:  "",
@@ -105,6 +108,23 @@ func TestFlag(t *testing.T) {
 				CheckFuzzy:     false, //-c
 				CheckNormal:    true,
 				CheckFileName:  true, //-f
+				ShowInfo:       true, //-n
+				PathDepth:      0,
+				Path:           "",
+				SearchPattern:  "",
+			},
+		},
+		{
+			name:    "level flag",
+			flagsIn: []string{"main", "package", "-n"},
+			result: finder.Settings{
+				LevelRest:      false, //-l
+				LevelRestLimit: -1,
+				CheckLetters:   false, //-i
+				CheckFuzzy:     false, //-c
+				CheckNormal:    true,
+				CheckFileName:  false, //-f
+				ShowInfo:       false, //-n
 				PathDepth:      0,
 				Path:           "",
 				SearchPattern:  "",
@@ -132,6 +152,10 @@ func TestFlag(t *testing.T) {
 
 			if res.CheckFileName != tc.result.CheckFileName {
 				t.Error("wrong -f handle")
+			}
+
+			if res.ShowInfo != tc.result.ShowInfo {
+				t.Error("wrong -n handle")
 			}
 
 			if res.CheckNormal != tc.result.CheckNormal {
