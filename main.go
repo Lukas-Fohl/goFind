@@ -16,8 +16,8 @@ fuzzy requirements:
     - get amount in file
     - no info output [x]
     - rewrite output
+    - no colors as flag
     - case sensitive [x]
-    - fix lower case output when search
     - star pattern??????????????
 
   - test:

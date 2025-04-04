@@ -1,6 +1,7 @@
 package finder
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -89,24 +90,25 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 }
 
 func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
+	tempLine := *line
 	if !settingsIn.CheckCaseSensitive {
-		*line = strings.ToLower(*line)
+		tempLine = strings.ToLower(*line)
 		settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
 	}
 
 	//check for right search
 	if settingsIn.CheckNormal {
-		found, index := FindExact(line, settingsIn.SearchPattern)
+		found, index := FindExact(&tempLine, settingsIn.SearchPattern)
 		return found, index
 	}
 
 	if settingsIn.CheckLetters {
-		found, index := FindChars(line, settingsIn.SearchPattern)
+		found, index := FindChars(&tempLine, settingsIn.SearchPattern)
 		return found, index
 	}
 
 	if settingsIn.CheckFuzzy {
-		found, index := FindFuzzy(line, settingsIn.SearchPattern)
+		found, index := FindFuzzy(&tempLine, settingsIn.SearchPattern)
 		return found, index
 	}
 
@@ -120,18 +122,22 @@ func FindTextInBuff(buffIn *string, settingsIn Settings, c chan Location, wg *sy
 		return
 	}
 
-	if !settingsIn.CheckCaseSensitive {
-		*buffIn = strings.ToLower(*buffIn)
-		settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
-	}
-
 	fileLines := strings.Split(string(*buffIn), "\n") //get lines
 	for i, lineIter := range fileLines {
-		found, index := FindTextInLine(&lineIter, &settingsIn)
+		var found bool
+		var index []int
+		if !settingsIn.CheckCaseSensitive {
+			settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
+			temp := strings.ToLower(lineIter)
+			found, index = FindTextInLine(&temp, &settingsIn)
+		} else {
+			found, index = FindTextInLine(&lineIter, &settingsIn)
+		}
 		if found {
 			c <- Location{Path: "", Line: lineIter, LineNum: i, CharNum: index}
 		}
 	}
+
 }
 
 func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *sync.WaitGroup) {
@@ -152,6 +158,7 @@ func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *syn
 	}
 
 	if !utf8.ValidString(string(dat[len(dat)/5:])) {
+		fmt.Printf("%s is binary file\n", pathIn)
 		return //check for binary-file
 	}
 
