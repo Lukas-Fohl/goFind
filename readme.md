@@ -1,13 +1,28 @@
-### requirements
+> command-line tool for quickly finding text patterns in files, file-names and text
+<br></br>
+### Table of Contents
+-----------------
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Flags](#flags)
+* [Features](#features)
+* [Tests](#tests)
+* [TODO](#todo)
+
+### Requirements:
+----------
  - git
  - make
  - go `>=1.22.2`
 
-### install
+### Installation:
+----------
  - `git clone github.com/lukas-fohl/goFind`
  - `cd goFind && sudo make install`
 
-### usage
+### Usage:
+----------
  - `gfind [path] [pattern] [flags]`
  - `gfind [file] [pattern] [flags]`
  - `gfind [pattern] [flags]` (assumes current path)
@@ -19,12 +34,8 @@
    - `cat main.go | gfind "package"`
    - `gfind ".go" -f`
 
-### test:
- - `go test ./tests -v`
- - for each flag
- - check flag function behav with sameples
-
-### flags:
+### Flags:
+----------
   - `-l`:
     - level depth of file tree search
   - `-f`:
@@ -38,7 +49,8 @@
   - `-s`:
     - not case sensitive
 
-### features:
+### Features:
+----------
  - read from file
  - read from file name
  - read from piped input
@@ -52,7 +64,14 @@
 <br></br>
 - output with and without color/info
 
+### Tests:
+----------
+ - `go test ./tests -v`
+ - for each flag
+ - check flag function behav with sameples
+
 ### TODO:
+----------
  - [x] impl fuzzy
  - [x] impl file name search
  - [x] split file into: main, search, output
