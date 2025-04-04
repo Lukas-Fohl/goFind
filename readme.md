@@ -1,27 +1,27 @@
 > command-line tool for quickly finding text patterns in files, file-names and text
 <br></br>
-### Table of Contents
+## Table of Contents
 -----------------
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Usage](#usage)
-* [Flags](#flags)
 * [Features](#features)
+  * [Flags](#flags)
 * [Tests](#tests)
 * [TODO](#todo)
 
-### Requirements:
+## Requirements:
 ----------
  - git
  - make
  - go `>=1.22.2`
 
-### Installation:
+## Installation:
 ----------
  - `git clone github.com/lukas-fohl/goFind`
  - `cd goFind && sudo make install`
 
-### Usage:
+## Usage:
 ----------
  - `gfind [path] [pattern] [flags]`
  - `gfind [file] [pattern] [flags]`
@@ -33,6 +33,22 @@
    - `gfind "start" -s -l 0`
    - `cat main.go | gfind "package"`
    - `gfind ".go" -f`
+
+## Features:
+----------
+ - read from file
+ - read from file name
+ - read from piped input
+<br></br>
+ - search recursive in dir for file content (with limit)
+<br></br>
+ - check for exact input
+ - check for fuzzy input
+ - check for letters in line
+ - check with/with out case sensitive
+<br></br>
+- output with and without color/info
+
 
 ### Flags:
 ----------
@@ -49,28 +65,13 @@
   - `-s`:
     - not case sensitive
 
-### Features:
-----------
- - read from file
- - read from file name
- - read from piped input
-<br></br>
- - search recursive in dir for file content (with limit)
-<br></br>
- - check for exact input
- - check for fuzzy input
- - check for letters in line
- - check with/with out case sensitive
-<br></br>
-- output with and without color/info
-
-### Tests:
+## Tests:
 ----------
  - `go test ./tests -v`
  - for each flag
  - check flag function behav with sameples
 
-### TODO:
+## TODO:
 ----------
  - [x] impl fuzzy
  - [x] impl file name search
