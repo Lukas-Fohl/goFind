@@ -64,8 +64,7 @@
  - [x] check for binary file
  - [ ] other stuff
  - [ ] change flags???
-</br>
-</br>
+
  - [x] file name 
  - [x] fix fuzzy char index
  - [x] fix indices name to indices
