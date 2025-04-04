@@ -39,21 +39,18 @@
     - not case sensitive
 
 ### features:
-  - read from file
-  - read from file name
-  - read from piped input
-</br>
-</br>
-  - search recursive in dir for file content (with limit)
-</br>
-</br>
-  - check for exact input
-  - check for fuzzy input
-  - check for letters in line
-  - check with/with out case sensitive
-</br>
-</br>
-  - output with and without color/info
+ - read from file
+ - read from file name
+ - read from piped input
+<br></br>
+ - search recursive in dir for file content (with limit)
+<br></br>
+ - check for exact input
+ - check for fuzzy input
+ - check for letters in line
+ - check with/with out case sensitive
+<br></br>
+- output with and without color/info
 
 ### TODO:
  - [x] impl fuzzy
@@ -64,7 +61,7 @@
  - [x] check for binary file
  - [ ] other stuff
  - [ ] change flags???
-
+ <br></br>
  - [x] file name 
  - [x] fix fuzzy char index
  - [x] fix indices name to indices
