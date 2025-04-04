@@ -54,80 +54,102 @@ func TestFlag(t *testing.T) {
 			name:    "fuzzy flag",
 			flagsIn: []string{"main", "package", "-c"},
 			result: finder.Settings{
-				LevelRest:      false, //-l
-				LevelRestLimit: -1,
-				CheckLetters:   false, //-i
-				CheckFuzzy:     true,  //-c
-				CheckNormal:    false,
-				CheckFileName:  false, //-f
-				ShowInfo:       true,  //-n
-				PathDepth:      0,
-				Path:           "",
-				SearchPattern:  "",
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         true,  //-c
+				CheckNormal:        false,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				ShowInfo:           true,  //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
 			},
 		},
 		{
 			name:    "level flag",
 			flagsIn: []string{"main", "package", "-l", "1"},
 			result: finder.Settings{
-				LevelRest:      true, //-l
-				LevelRestLimit: 1,
-				CheckLetters:   false, //-i
-				CheckFuzzy:     false, //-c
-				CheckNormal:    true,
-				CheckFileName:  false, //-f
-				ShowInfo:       true,  //-n
-				PathDepth:      0,
-				Path:           "",
-				SearchPattern:  "",
+				LevelRest:          true, //-l
+				LevelRestLimit:     1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				ShowInfo:           true,  //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
 			},
 		},
 		{
 			name:    "letter flag",
 			flagsIn: []string{"main", "package", "-i"},
 			result: finder.Settings{
-				LevelRest:      false, //-l
-				LevelRestLimit: -1,
-				CheckLetters:   true,  //-i
-				CheckFuzzy:     false, //-c
-				CheckNormal:    false,
-				CheckFileName:  false, //-f
-				ShowInfo:       true,  //-n
-				PathDepth:      0,
-				Path:           "",
-				SearchPattern:  "",
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       true,  //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        false,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				ShowInfo:           true,  //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
 			},
 		},
 		{
-			name:    "level flag",
+			name:    "filename flag",
 			flagsIn: []string{"main", "package", "-f"},
 			result: finder.Settings{
-				LevelRest:      false, //-l
-				LevelRestLimit: -1,
-				CheckLetters:   false, //-i
-				CheckFuzzy:     false, //-c
-				CheckNormal:    true,
-				CheckFileName:  true, //-f
-				ShowInfo:       true, //-n
-				PathDepth:      0,
-				Path:           "",
-				SearchPattern:  "",
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      true, //-f
+				CheckCaseSensitive: true, //-s
+				ShowInfo:           true, //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
 			},
 		},
 		{
-			name:    "level flag",
+			name:    "check case flag",
+			flagsIn: []string{"main", "package", "-s"},
+			result: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: false, //-s
+				ShowInfo:           true,  //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
+			},
+		},
+		{
+			name:    "show info flag",
 			flagsIn: []string{"main", "package", "-n"},
 			result: finder.Settings{
-				LevelRest:      false, //-l
-				LevelRestLimit: -1,
-				CheckLetters:   false, //-i
-				CheckFuzzy:     false, //-c
-				CheckNormal:    true,
-				CheckFileName:  false, //-f
-				ShowInfo:       false, //-n
-				PathDepth:      0,
-				Path:           "",
-				SearchPattern:  "",
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				ShowInfo:           false, //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
 			},
 		},
 	}
@@ -156,6 +178,10 @@ func TestFlag(t *testing.T) {
 
 			if res.ShowInfo != tc.result.ShowInfo {
 				t.Error("wrong -n handle")
+			}
+
+			if res.CheckCaseSensitive != tc.result.CheckCaseSensitive {
+				t.Error("wrong -s handle")
 			}
 
 			if res.CheckNormal != tc.result.CheckNormal {

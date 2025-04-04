@@ -63,6 +63,11 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 		return false, []int{}
 	}
 
+	found, indices := FindExact(line, searchPattern)
+	if found {
+		return found, indices
+	}
+
 	//search with one char added somewhere
 	for i := 0; i < len(searchPattern); i++ {
 		found, indices := FindChars(line, searchPattern)
@@ -83,20 +88,25 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
-func FindTextInLine(line *string, SettingsIn *Settings) (bool, []int) {
+func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
+	if !settingsIn.CheckCaseSensitive {
+		*line = strings.ToLower(*line)
+		settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
+	}
+
 	//check for right search
-	if SettingsIn.CheckNormal {
-		found, index := FindExact(line, SettingsIn.SearchPattern)
+	if settingsIn.CheckNormal {
+		found, index := FindExact(line, settingsIn.SearchPattern)
 		return found, index
 	}
 
-	if SettingsIn.CheckLetters {
-		found, index := FindChars(line, SettingsIn.SearchPattern)
+	if settingsIn.CheckLetters {
+		found, index := FindChars(line, settingsIn.SearchPattern)
 		return found, index
 	}
 
-	if SettingsIn.CheckFuzzy {
-		found, index := FindFuzzy(line, SettingsIn.SearchPattern)
+	if settingsIn.CheckFuzzy {
+		found, index := FindFuzzy(line, settingsIn.SearchPattern)
 		return found, index
 	}
 
@@ -110,11 +120,16 @@ func FindTextInBuff(buffIn *string, settingsIn Settings, c chan Location, wg *sy
 		return
 	}
 
+	if !settingsIn.CheckCaseSensitive {
+		*buffIn = strings.ToLower(*buffIn)
+		settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
+	}
+
 	fileLines := strings.Split(string(*buffIn), "\n") //get lines
 	for i, lineIter := range fileLines {
 		found, index := FindTextInLine(&lineIter, &settingsIn)
 		if found {
-			c <- Location{path: "", line: lineIter, lineNum: i, charNum: index}
+			c <- Location{Path: "", Line: lineIter, LineNum: i, CharNum: index}
 		}
 	}
 }
@@ -126,7 +141,7 @@ func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *syn
 		_, fileName := path.Split(pathIn)
 		found, index := FindTextInLine(&fileName, &SettingsIn)
 		if found {
-			c <- Location{path: pathIn, line: fileName, lineNum: 0, charNum: index}
+			c <- Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index}
 		}
 		return
 	}
@@ -144,7 +159,7 @@ func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *syn
 	for i := 0; i < len(fileLines); i++ {
 		found, index := FindTextInLine(&(fileLines[i]), &SettingsIn)
 		if found {
-			c <- Location{path: pathIn, line: fileLines[i], lineNum: i, charNum: index} //add result to chanel
+			c <- Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index} //add result to chanel
 		}
 	}
 }

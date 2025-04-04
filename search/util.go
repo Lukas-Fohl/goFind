@@ -12,39 +12,41 @@ import (
 )
 
 type Settings struct {
-	LevelRest      bool //level restriction
-	LevelRestLimit int  //value for ^
-	CheckLetters   bool
-	CheckFuzzy     bool
-	CheckNormal    bool
-	CheckFileName  bool
-	ShowInfo       bool
-	PipeInput      bool
-	Path           string
-	PathDepth      int
-	SearchPattern  string
+	LevelRest          bool //level restriction
+	LevelRestLimit     int  //value for ^
+	CheckLetters       bool
+	CheckFuzzy         bool
+	CheckNormal        bool
+	CheckFileName      bool
+	CheckCaseSensitive bool
+	ShowInfo           bool
+	PipeInput          bool
+	Path               string
+	PathDepth          int
+	SearchPattern      string
 }
 
 type Location struct {
-	line    string
-	path    string
-	lineNum int
-	charNum []int
+	Line    string
+	Path    string
+	LineNum int
+	CharNum []int
 }
 
 func DefaultSettings() Settings {
 	return Settings{
-		LevelRest:      false,
-		LevelRestLimit: -1,
-		CheckLetters:   false,
-		CheckFuzzy:     false,
-		CheckNormal:    true,
-		CheckFileName:  false,
-		ShowInfo:       true,
-		PipeInput:      false,
-		PathDepth:      0,
-		Path:           "",
-		SearchPattern:  "",
+		LevelRest:          false,
+		LevelRestLimit:     -1,
+		CheckLetters:       false,
+		CheckFuzzy:         false,
+		CheckNormal:        true,
+		CheckFileName:      false,
+		CheckCaseSensitive: true,
+		ShowInfo:           true,
+		PipeInput:          false,
+		PathDepth:          0,
+		Path:               "",
+		SearchPattern:      "",
 	}
 }
 
@@ -76,6 +78,8 @@ func FlagHandle(args []string) Settings {
 			instSettings.CheckFileName = true
 		case "-n":
 			instSettings.ShowInfo = false
+		case "-s":
+			instSettings.CheckCaseSensitive = false
 		case "-l":
 			instSettings.LevelRest = true
 			if i < len(args)-1 {
@@ -93,6 +97,15 @@ func FlagHandle(args []string) Settings {
 				//first two must be path and pattern
 				instSettings.Path = args[1]
 				instSettings.SearchPattern = args[2]
+
+				fi, err := os.Stdin.Stat()
+				if err != nil {
+					panic(err)
+				}
+
+				if fi.Mode()&os.ModeNamedPipe != 0 {
+					panic("path in piped input")
+				}
 			} else {
 				panic("flag not found")
 			}

@@ -4,6 +4,7 @@ import (
 	finder "finder/search"
 	"math/rand/v2"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -241,6 +242,71 @@ func TestFindFuzzyProp(t *testing.T) {
 			}
 			if len(indices) != tc.wantLen {
 				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
+			}
+		})
+	}
+}
+
+func TestCaseSearch(t *testing.T) {
+	testCases := []struct {
+		name     string
+		line     string
+		settings finder.Settings
+		result   bool
+	}{
+		{
+			name: "not found lower",
+			line: "TEST",
+			settings: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				ShowInfo:           true,  //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "test",
+			},
+			result: false,
+		},
+		{
+			name: "found lower",
+			line: "TEST",
+			settings: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: false, //-s
+				ShowInfo:           true,  //-n
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "test",
+			},
+			result: true,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			c := make(chan finder.Location)
+			var wg sync.WaitGroup
+			wg.Add(1)
+			go finder.FindTextInBuff(&tc.line, tc.settings, c, &wg)
+
+			go func() {
+				wg.Wait()
+				close(c)
+			}()
+
+			for msg := range c {
+				if (len(msg.CharNum) != 0) != tc.result {
+					t.Error("wrong reuslt in case sensitive test")
+				}
 			}
 		})
 	}
