@@ -1,7 +1,6 @@
 package finder
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -158,7 +157,7 @@ func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *syn
 	}
 
 	if !utf8.ValidString(string(dat[len(dat)/5:])) {
-		fmt.Printf("%s is binary file\n", pathIn)
+		//fmt.Printf("%s is binary file\n", pathIn)
 		return //check for binary-file
 	}
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 func PrintResult(c chan Location, instSettings Settings) {
@@ -38,12 +39,13 @@ func PrintResult(c chan Location, instSettings Settings) {
 		}
 
 		coloredPrinted := 0
-		for i := 0; i < len(msg.Line); i++ {
+		splitLine := strings.Split(msg.Line, "")
+		for i := 0; i < len(splitLine); i++ {
 			if coloredPrinted < len(msg.CharNum) && i == msg.CharNum[coloredPrinted] {
-				fmt.Print("\x1b[1;31m" + string(msg.Line[i]))
+				fmt.Print("\x1b[1;31m" + string(splitLine[i]))
 				coloredPrinted++
 			} else {
-				fmt.Print("\x1b[0m" + string(msg.Line[i]))
+				fmt.Print("\x1b[0m" + string(splitLine[i]))
 			}
 		}
 

@@ -1,13 +1,14 @@
 > command-line tool for quickly finding text patterns in files, file-names and text
 <br></br>
 ## Table of Contents
-* [Requirements](#requirements)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Features](#features)
-  * [Flags](#flags)
-* [Tests](#tests)
-* [TODO](#todo)
+- [Table of Contents](#table-of-contents)
+- [Requirements:](#requirements)
+- [Installation:](#installation)
+- [Usage:](#usage)
+- [Features:](#features)
+  - [Flags:](#flags)
+- [Tests:](#tests)
+- [TODO:](#todo)
 
 ## Requirements:
  - git
@@ -15,8 +16,11 @@
  - go `>=1.22.2`
 
 ## Installation:
- - `git clone github.com/lukas-fohl/goFind`
- - `cd goFind && sudo make install`
+ - linux:
+```bash
+git clone github.com/lukas-fohl/goFind
+cd goFind && sudo make install
+```
 
 ## Usage:
  - `gfind [path] [pattern] [flags]`
@@ -61,8 +65,8 @@
 
 ## Tests:
  - `go test ./tests -v`
- - for each flag
- - check flag function behav with sameples
+ - for each search
+ - check flag function behaviour with sameples
 
 ## TODO:
  - [x] impl fuzzy
@@ -81,6 +85,10 @@
  - [ ] get amount in file
  - [x] no info output
  - [ ] rewrite output
- - [ ] no colors as flag
+ - [ ] no colors as flag??????????????
  - [x] case sensitive
  - [ ] star pattern??????????????
+ - [ ] check file permissions
+ - [ ] replace panic with print when needed
+ - [ ] when looking at single file and is binary the tell that is binary
+ - [ ] fix utf8 and unicode
