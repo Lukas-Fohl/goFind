@@ -60,6 +60,8 @@ cd goFind && sudo make install
     - input can have 1 letter changed (missing, added, different)
   - `-n`:
     - no info in output, just the line
+  - `-t`:
+    - removes color from output
   - `-s`:
     - not case sensitive
 
@@ -85,10 +87,10 @@ cd goFind && sudo make install
  - [ ] get amount in file
  - [x] no info output
  - [ ] rewrite output
- - [ ] no colors as flag??????????????
+ - [x] no colors as flag!!!!!!!!!!!!!!
  - [x] case sensitive
- - [ ] star pattern??????????????
+ - [ ] star patternr!!!!!!!!!!!!!
  - [ ] check file permissions
  - [ ] replace panic with print when needed
  - [ ] when looking at single file and is binary the tell that is binary
- - [ ] fix utf8 and unicode
+ - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))

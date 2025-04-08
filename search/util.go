@@ -20,6 +20,7 @@ type Settings struct {
 	CheckFileName      bool
 	CheckCaseSensitive bool
 	ShowInfo           bool
+	ShowColor          bool
 	PipeInput          bool
 	Path               string
 	PathDepth          int
@@ -43,6 +44,7 @@ func DefaultSettings() Settings {
 		CheckFileName:      false,
 		CheckCaseSensitive: true,
 		ShowInfo:           true,
+		ShowColor:          true,
 		PipeInput:          false,
 		PathDepth:          0,
 		Path:               "",
@@ -78,6 +80,8 @@ func FlagHandle(args []string) Settings {
 			instSettings.CheckFileName = true
 		case "-n":
 			instSettings.ShowInfo = false
+		case "-t":
+			instSettings.ShowColor = false
 		case "-s":
 			instSettings.CheckCaseSensitive = false
 		case "-l":

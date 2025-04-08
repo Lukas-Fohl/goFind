@@ -62,6 +62,7 @@ func TestFlag(t *testing.T) {
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
 				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -79,6 +80,7 @@ func TestFlag(t *testing.T) {
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
 				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -96,6 +98,7 @@ func TestFlag(t *testing.T) {
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
 				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -113,6 +116,7 @@ func TestFlag(t *testing.T) {
 				CheckFileName:      true, //-f
 				CheckCaseSensitive: true, //-s
 				ShowInfo:           true, //-n
+				ShowColor:          true, //-t
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -130,6 +134,7 @@ func TestFlag(t *testing.T) {
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: false, //-s
 				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -147,6 +152,25 @@ func TestFlag(t *testing.T) {
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
 				ShowInfo:           false, //-n
+				ShowColor:          true,  //-t
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
+			},
+		},
+		{
+			name:    "no color flag",
+			flagsIn: []string{"main", "package", "-t"},
+			result: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				ShowInfo:           true,  //-n
+				ShowColor:          false, //-t
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -186,6 +210,10 @@ func TestFlag(t *testing.T) {
 
 			if res.CheckNormal != tc.result.CheckNormal {
 				t.Error("normal flag not set")
+			}
+
+			if res.ShowColor != tc.result.ShowColor {
+				t.Error("wrong -t handle")
 			}
 		})
 	}

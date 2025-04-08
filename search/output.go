@@ -13,6 +13,7 @@ func PrintResult(c chan Location, instSettings Settings) {
 			fmt.Println(msg.Line)
 			continue
 		}
+
 		charIndex := -1
 		if len(msg.CharNum) > 0 {
 			charIndex = msg.CharNum[0]
@@ -26,7 +27,12 @@ func PrintResult(c chan Location, instSettings Settings) {
 		}
 
 		if !instSettings.PipeInput {
-			fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
+			if instSettings.ShowColor {
+				fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
+			} else {
+				fmt.Print(absPath)
+			}
+
 			if instSettings.CheckNormal {
 				if !instSettings.CheckFileName {
 					fmt.Print(strconv.FormatInt(int64(msg.LineNum), 10) + ",")
@@ -41,7 +47,7 @@ func PrintResult(c chan Location, instSettings Settings) {
 		coloredPrinted := 0
 		splitLine := strings.Split(msg.Line, "")
 		for i := 0; i < len(splitLine); i++ {
-			if coloredPrinted < len(msg.CharNum) && i == msg.CharNum[coloredPrinted] {
+			if coloredPrinted < len(msg.CharNum) && i == msg.CharNum[coloredPrinted] && instSettings.ShowColor {
 				fmt.Print("\x1b[1;31m" + string(splitLine[i]))
 				coloredPrinted++
 			} else {

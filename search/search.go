@@ -9,24 +9,29 @@ import (
 )
 
 func FindExact(line *string, searchPattern string) (bool, []int) {
-	if line == nil || len(*line) == 0 || len(searchPattern) == 0 {
+	if line == nil {
+		return false, []int{}
+	}
+	splitLine := strings.Split(*line, "")
+	splitPattern := strings.Split(searchPattern, "")
+	if len(splitLine) == 0 || len(splitPattern) == 0 {
 		return false, []int{}
 	}
 
 	//iterate over line and check for match at each char
 	returnList := []int{}
-	for i := 0; i < len(*line)-len(searchPattern)+1; i++ {
+	for i := 0; i < len(splitLine)-len(splitPattern)+1; i++ {
 		searchLength := 0
-		for j := 0; j < len(searchPattern); j++ {
-			if (*line)[i+j] != searchPattern[j] {
+		for j := 0; j < len(splitPattern); j++ {
+			if splitLine[i+j] != splitPattern[j] {
 				break
 			} else {
 				searchLength++
 			}
 		}
 
-		if searchLength == len(searchPattern) {
-			for j := 0; j < len(searchPattern); j++ {
+		if searchLength == len(splitPattern) {
+			for j := 0; j < len(splitPattern); j++ {
 				returnList = append(returnList, i+j)
 			}
 			return true, returnList
@@ -37,21 +42,26 @@ func FindExact(line *string, searchPattern string) (bool, []int) {
 }
 
 func FindChars(line *string, searchPattern string) (bool, []int) {
-	if line == nil || len(*line) == 0 || len(searchPattern) == 0 {
+	if line == nil {
+		return false, []int{}
+	}
+	splitLine := strings.Split(*line, "")
+	splitPattern := strings.Split(searchPattern, "")
+	if len(splitLine) == 0 || len(splitPattern) == 0 {
 		return false, []int{}
 	}
 
 	returnList := []int{}
 	charsFound := 0
 	//iterate over line and check if each char is matched
-	for i := 0; i < len(*line); i++ {
-		if charsFound < len(searchPattern) && (*line)[i] == searchPattern[charsFound] {
+	for i := 0; i < len(splitLine); i++ {
+		if charsFound < len(splitPattern) && splitLine[i] == splitPattern[charsFound] {
 			charsFound++
 			returnList = append(returnList, i)
 		}
 	}
 
-	if len(searchPattern) == charsFound {
+	if len(splitPattern) == charsFound {
 		return true, returnList
 	}
 
@@ -59,7 +69,12 @@ func FindChars(line *string, searchPattern string) (bool, []int) {
 }
 
 func FindFuzzy(line *string, searchPattern string) (bool, []int) {
-	if line == nil || len(*line) == 0 || len(searchPattern) == 0 {
+	if line == nil {
+		return false, []int{}
+	}
+	splitLine := strings.Split(*line, "")
+	splitPattern := strings.Split(searchPattern, "")
+	if len(splitLine) == 0 || len(splitPattern) == 0 {
 		return false, []int{}
 	}
 
@@ -69,18 +84,18 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 	}
 
 	//search with one char added somewhere
-	for i := 0; i < len(searchPattern); i++ {
+	for i := 0; i < len(splitPattern); i++ {
 		found, indices := FindChars(line, searchPattern)
-		if found && indices[len(indices)-1]-indices[0] <= len(searchPattern) {
+		if found && indices[len(indices)-1]-indices[0] <= len(splitPattern) {
 			return found, indices
 		}
 	}
 
 	//search pattern with each char missing -> one wrong char or one missing
-	for i := 0; i < len(searchPattern); i++ {
-		newSearch := searchPattern[:i] + searchPattern[i+1:]
+	for i := 0; i < len(splitPattern); i++ {
+		newSearch := strings.Join(splitPattern[:i], "") + strings.Join(splitPattern[i+1:], "")
 		found, indices := FindChars(line, newSearch)
-		if found && indices[len(indices)-1]-indices[0] < len(searchPattern) {
+		if found && indices[len(indices)-1]-indices[0] < len(splitPattern) {
 			return found, indices
 		}
 	}
