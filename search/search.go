@@ -1,6 +1,7 @@
 package finder
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -168,7 +169,7 @@ func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *syn
 
 	dat, err := os.ReadFile(pathIn)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	if !utf8.ValidString(string(dat[len(dat)/5:])) {
