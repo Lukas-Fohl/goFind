@@ -77,24 +77,24 @@ cd goFind && sudo make install
  - [ ] write docs
  - [x] build test
  - [x] check for binary file
- - [ ] other stuff
  - [ ] change flags???
  <br></br>
  - [x] file name 
  - [x] fix fuzzy char index
  - [x] fix indices name to indices
  - [x] get input from buffer (some | goFind "test")
- - [ ] get amount in file
+ - [ ] get amount in file?????????????
  - [x] no info output
- - [ ] rewrite output
+ - [ ] rewrite output!!!!!!!!!!!!!!
  - [x] no colors as flag!!!!!!!!!!!!!!
  - [x] case sensitive
- - [ ] star pattern!!!!!!!!!!!!!
+ - [ ] star pattern?????????????
    - pattern-transformer:
      - \ as escape for * (when using as normal)
      - * search for exact (between *)
- - [ ] check file permissions
- - [ ] replace panic with print when needed
- - [ ] when looking at single file and is binary the tell that is binary
- - [ ] oom error
+ - [x] check file permissions
+ - [x] replace panic with print when needed
+ - [x] when looking at single file and is binary the tell that is binary
+ - [ ] oom error!!!!!!!!!!!!!
+ - [ ] rework flags?????????????
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))

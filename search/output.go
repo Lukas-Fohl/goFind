@@ -50,11 +50,16 @@ func PrintResult(c chan Location, instSettings Settings) {
 			if coloredPrinted < len(msg.CharNum) && i == msg.CharNum[coloredPrinted] && instSettings.ShowColor {
 				fmt.Print("\x1b[1;31m" + string(splitLine[i]))
 				coloredPrinted++
+			} else if !instSettings.ShowColor {
+				fmt.Print(string(splitLine[i]))
 			} else {
 				fmt.Print("\x1b[0m" + string(splitLine[i]))
 			}
 		}
-
-		fmt.Print("\x1b[0m\n")
+		if !instSettings.ShowColor {
+			fmt.Print("\n")
+		} else {
+			fmt.Print("\x1b[0m\n")
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package finder
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -56,12 +57,14 @@ func FlagHandle(args []string) Settings {
 	instSettings := DefaultSettings()
 
 	if len(args) < 2 {
-		panic("not enougth arguments")
+		fmt.Println("Error: not enougth arguments")
+		os.Exit(-1)
 	} else {
 		//case no path is provided
 		pathOut, err := os.Getwd()
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(-1)
 		}
 
 		instSettings.Path = pathOut
@@ -89,12 +92,14 @@ func FlagHandle(args []string) Settings {
 			if i < len(args)-1 {
 				argToInt, err := strconv.Atoi(args[i+1])
 				if err != nil {
-					panic("no size provided for depth")
+					fmt.Println("Error: no size provided for depth")
+					os.Exit(-1)
 				}
 				instSettings.LevelRestLimit = argToInt
 				i++
 			} else {
-				panic("no size provided for depth")
+				fmt.Println("Error: no size provided for depth")
+				os.Exit(-1)
 			}
 		default:
 			if i == 2 {
@@ -108,10 +113,12 @@ func FlagHandle(args []string) Settings {
 				}
 
 				if fi.Mode()&os.ModeNamedPipe != 0 {
-					panic("path in piped input")
+					fmt.Println("Error: path in piped input")
+					os.Exit(-1)
 				}
 			} else {
-				panic("flag not found")
+				fmt.Println("Error: flag not found")
+				os.Exit(-1)
 			}
 		}
 	}
@@ -141,7 +148,8 @@ func Start() {
 			panic(err)
 		}
 		if !utf8.ValidString(string(n)) {
-			panic("pipe input not valid utf8")
+			fmt.Println("Error: pipe input not valid utf8")
+			os.Exit(-1)
 		}
 		instSettings.PipeInput = true
 		pipe = string(n)

@@ -14,7 +14,7 @@ run:
 	$(buildPath)/gfind "/home/lukas/code/td/" "package" -l 1 -c
 
 install:
-	$(MAKE) build
+	$(MAKE) build -B
 	@if [ -f /usr/bin/$(exeName) ]; then\
 		rm /usr/bin/$(exeName);\
 	fi
