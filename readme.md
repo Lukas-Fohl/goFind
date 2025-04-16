@@ -95,6 +95,7 @@ cd goFind && sudo make install
  - [x] check file permissions
  - [x] replace panic with print when needed
  - [x] when looking at single file and is binary the tell that is binary
- - [ ] oom error!!!!!!!!!!!!!
+ - [x] oom error!!!!!!!!!!!!!
+ - [ ] readd gorutines!!!!!!!!!!!!!
  - [ ] rework flags?????????????
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 	"strings"
-	"sync"
 	"unicode/utf8"
 )
 
@@ -130,9 +129,7 @@ func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
 	return false, []int{}
 }
 
-func FindTextInBuff(buffIn *string, settingsIn Settings, c chan Location, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func FindTextInBuff(buffIn *string, settingsIn Settings) {
 	if !utf8.ValidString(*buffIn) {
 		return
 	}
@@ -149,20 +146,18 @@ func FindTextInBuff(buffIn *string, settingsIn Settings, c chan Location, wg *sy
 			found, index = FindTextInLine(&lineIter, &settingsIn)
 		}
 		if found {
-			c <- Location{Path: "", Line: lineIter, LineNum: i, CharNum: index}
+			PrintResult(Location{Path: "", Line: lineIter, LineNum: i, CharNum: index}, settingsIn)
 		}
 	}
 
 }
 
-func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func FindTextInFile(pathIn string, SettingsIn Settings) {
 	if SettingsIn.CheckFileName {
 		_, fileName := path.Split(pathIn)
 		found, index := FindTextInLine(&fileName, &SettingsIn)
 		if found {
-			c <- Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index}
+			PrintResult(Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index}, SettingsIn)
 		}
 		return
 	}
@@ -183,7 +178,8 @@ func FindTextInFile(pathIn string, SettingsIn Settings, c chan Location, wg *syn
 	for i := 0; i < len(fileLines); i++ {
 		found, index := FindTextInLine(&(fileLines[i]), &SettingsIn)
 		if found {
-			c <- Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index} //add result to chanel
+			PrintResult(Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index}, SettingsIn)
+			//c <- Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index} //add result to chanel
 		}
 	}
 }

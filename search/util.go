@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 	"unicode/utf8"
 )
 
@@ -155,12 +154,8 @@ func Start() {
 		pipe = string(n)
 	}
 
-	c := make(chan Location)
-	var wg sync.WaitGroup
-
 	if instSettings.PipeInput {
-		wg.Add(1)
-		go FindTextInBuff(&pipe, instSettings, c, &wg)
+		FindTextInBuff(&pipe, instSettings)
 	} else {
 		dat, err := os.Stat(instSettings.Path)
 		if err != nil {
@@ -180,8 +175,7 @@ func Start() {
 						if ((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir() { //check if path is file and not executable
 							currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.PathDepth - 1
 							if (instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest {
-								wg.Add(1)
-								go FindTextInFile(pathIn, instSettings, c, &wg)
+								FindTextInFile(pathIn, instSettings)
 							}
 						}
 					}
@@ -193,15 +187,9 @@ func Start() {
 			}
 
 		case pathType.IsRegular():
-			wg.Add(1)
-			go FindTextInFile(instSettings.Path, instSettings, c, &wg)
+			FindTextInFile(instSettings.Path, instSettings)
 		}
 	}
 
-	go func() {
-		wg.Wait()
-		close(c)
-	}()
-
-	PrintResult(c, instSettings)
+	//PrintResult(c, instSettings)
 }

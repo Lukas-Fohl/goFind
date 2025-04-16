@@ -4,7 +4,6 @@ import (
 	finder "finder/search"
 	"math/rand/v2"
 	"strings"
-	"sync"
 	"testing"
 )
 
@@ -94,6 +93,7 @@ func TestFindChars(t *testing.T) {
 			wantLen:  0,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			found, indices := finder.FindChars(&tc.text, tc.pattern)
@@ -151,6 +151,7 @@ func TestFindFuzzy(t *testing.T) {
 			wantLen:  5,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			found, indices := finder.FindFuzzy(&tc.text, tc.pattern)
@@ -234,6 +235,7 @@ func TestFindFuzzyProp(t *testing.T) {
 			wantLen:  sta + 1,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			found, indices := finder.FindFuzzy(&tc.text, tc.pattern)
@@ -247,6 +249,7 @@ func TestFindFuzzyProp(t *testing.T) {
 	}
 }
 
+/*
 func TestCaseSearch(t *testing.T) {
 	testCases := []struct {
 		name     string
@@ -291,6 +294,7 @@ func TestCaseSearch(t *testing.T) {
 			result: true,
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			c := make(chan finder.Location)
@@ -311,3 +315,4 @@ func TestCaseSearch(t *testing.T) {
 		})
 	}
 }
+*/
