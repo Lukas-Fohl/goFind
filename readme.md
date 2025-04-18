@@ -85,6 +85,7 @@ cd goFind && sudo make install
  - [x] get input from buffer (some | goFind "test")
  - [ ] get amount in file?????????????
  - [x] no info output
+ - [ ] change var names
  - [ ] rewrite output!!!!!!!!!!!!!!
  - [x] no colors as flag!!!!!!!!!!!!!!
  - [x] case sensitive

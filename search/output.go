@@ -8,15 +8,15 @@ import (
 )
 
 func PrintResult(lin Location, instSettings Settings) {
-	if !instSettings.ShowInfo {
-		fmt.Println(lin.Line)
-		return
-	}
-
 	charIndex := -1
 	if len(lin.CharNum) > 0 {
 		charIndex = lin.CharNum[0]
 	} else {
+		return
+	}
+
+	if !instSettings.ShowInfo {
+		fmt.Println(lin.Line)
 		return
 	}
 

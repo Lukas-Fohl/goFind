@@ -155,7 +155,10 @@ func Start() {
 	}
 
 	if instSettings.PipeInput {
-		FindTextInBuff(&pipe, instSettings)
+		for _, res := range FindTextInBuff(&pipe, instSettings) {
+			PrintResult(res, instSettings)
+		}
+
 	} else {
 		dat, err := os.Stat(instSettings.Path)
 		if err != nil {
@@ -170,13 +173,13 @@ func Start() {
 						return err
 					}
 
+					currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.PathDepth - 1
 					stat, err := os.Stat(pathIn)
-					if err == nil {
-						if ((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir() { //check if path is file and not executable
-							currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.PathDepth - 1
-							if (instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest {
-								FindTextInFile(pathIn, instSettings)
-							}
+					if err == nil &&
+						(((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir()) && //check if path is file and not executable
+						((instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest) { //check path level
+						for _, res := range FindTextInFile(pathIn, instSettings) {
+							PrintResult(res, instSettings)
 						}
 					}
 					return nil
@@ -187,7 +190,10 @@ func Start() {
 			}
 
 		case pathType.IsRegular():
-			FindTextInFile(instSettings.Path, instSettings)
+			for _, res := range FindTextInFile(instSettings.Path, instSettings) {
+				PrintResult(res, instSettings)
+			}
+
 		}
 	}
 

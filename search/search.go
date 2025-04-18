@@ -51,18 +51,18 @@ func FindChars(line *string, searchPattern string) (bool, []int) {
 		return false, []int{}
 	}
 
-	returnList := []int{}
+	indexList := []int{}
 	charsFound := 0
 	//iterate over line and check if each char is matched
 	for i := 0; i < len(splitLine); i++ {
 		if charsFound < len(splitPattern) && splitLine[i] == splitPattern[charsFound] {
 			charsFound++
-			returnList = append(returnList, i)
+			indexList = append(indexList, i)
 		}
 	}
 
 	if len(splitPattern) == charsFound {
-		return true, returnList
+		return true, indexList
 	}
 
 	return false, []int{}
@@ -129,9 +129,10 @@ func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
 	return false, []int{}
 }
 
-func FindTextInBuff(buffIn *string, settingsIn Settings) {
+func FindTextInBuff(buffIn *string, settingsIn Settings) []Location {
+	locationList := []Location{}
 	if !utf8.ValidString(*buffIn) {
-		return
+		return locationList
 	}
 
 	fileLines := strings.Split(string(*buffIn), "\n") //get lines
@@ -146,20 +147,22 @@ func FindTextInBuff(buffIn *string, settingsIn Settings) {
 			found, index = FindTextInLine(&lineIter, &settingsIn)
 		}
 		if found {
-			PrintResult(Location{Path: "", Line: lineIter, LineNum: i, CharNum: index}, settingsIn)
+			locationList = append(locationList, Location{Path: "", Line: lineIter, LineNum: i, CharNum: index})
 		}
 	}
 
+	return locationList
 }
 
-func FindTextInFile(pathIn string, SettingsIn Settings) {
+func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
+	locationList := []Location{}
 	if SettingsIn.CheckFileName {
 		_, fileName := path.Split(pathIn)
 		found, index := FindTextInLine(&fileName, &SettingsIn)
 		if found {
-			PrintResult(Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index}, SettingsIn)
+			locationList = append(locationList, Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index})
 		}
-		return
+		return locationList
 	}
 
 	dat, err := os.ReadFile(pathIn)
@@ -171,15 +174,16 @@ func FindTextInFile(pathIn string, SettingsIn Settings) {
 		if pathIn == SettingsIn.Path {
 			fmt.Printf("%s is a binary file\n", pathIn)
 		}
-		return //check for binary-file
+		return locationList //check for binary-file
 	}
 
 	fileLines := strings.Split(string(dat), "\n") //get lines
 	for i := 0; i < len(fileLines); i++ {
 		found, index := FindTextInLine(&(fileLines[i]), &SettingsIn)
 		if found {
-			PrintResult(Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index}, SettingsIn)
-			//c <- Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index} //add result to chanel
+			locationList = append(locationList, Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index})
 		}
 	}
+
+	return locationList
 }
