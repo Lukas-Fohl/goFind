@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode/utf8"
 )
 
@@ -136,6 +137,8 @@ func FlagHandle(args []string) Settings {
 func Start() {
 	instSettings := FlagHandle(os.Args)
 
+	var wg sync.WaitGroup
+
 	var pipe string
 	fi, err := os.Stdin.Stat()
 	if err != nil {
@@ -155,9 +158,13 @@ func Start() {
 	}
 
 	if instSettings.PipeInput {
-		for _, res := range FindTextInBuff(&pipe, instSettings) {
-			PrintResult(res, instSettings)
-		}
+		wg.Add(1)
+		go func() {
+			for _, res := range FindTextInBuff(&pipe, instSettings) {
+				defer wg.Done()
+				PrintResult(res, instSettings)
+			}
+		}()
 
 	} else {
 		dat, err := os.Stat(instSettings.Path)
@@ -178,9 +185,13 @@ func Start() {
 					if err == nil &&
 						(((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir()) && //check if path is file and not executable
 						((instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest) { //check path level
-						for _, res := range FindTextInFile(pathIn, instSettings) {
-							PrintResult(res, instSettings)
-						}
+						wg.Add(1)
+						go func() {
+							defer wg.Done()
+							for _, res := range FindTextInFile(pathIn, instSettings) {
+								PrintResult(res, instSettings)
+							}
+						}()
 					}
 					return nil
 				})
@@ -190,12 +201,15 @@ func Start() {
 			}
 
 		case pathType.IsRegular():
-			for _, res := range FindTextInFile(instSettings.Path, instSettings) {
-				PrintResult(res, instSettings)
-			}
-
+			wg.Add(1)
+			go func() {
+				for _, res := range FindTextInFile(instSettings.Path, instSettings) {
+					defer wg.Done()
+					PrintResult(res, instSettings)
+				}
+			}()
 		}
 	}
 
-	//PrintResult(c, instSettings)
+	wg.Wait()
 }

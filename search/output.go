@@ -1,13 +1,17 @@
 package finder
 
 import (
-	"fmt"
+	"bufio"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 )
 
 func PrintResult(lin Location, instSettings Settings) {
+	f := bufio.NewWriter(os.Stdout)
+	defer f.Flush()
+
 	charIndex := -1
 	if len(lin.CharNum) > 0 {
 		charIndex = lin.CharNum[0]
@@ -16,7 +20,7 @@ func PrintResult(lin Location, instSettings Settings) {
 	}
 
 	if !instSettings.ShowInfo {
-		fmt.Println(lin.Line)
+		f.Write([]byte(lin.Line + "\n"))
 		return
 	}
 
@@ -27,37 +31,38 @@ func PrintResult(lin Location, instSettings Settings) {
 
 	if !instSettings.PipeInput {
 		if instSettings.ShowColor {
-			fmt.Print("\x1b[1;36m" + absPath + "\x1b[0m:")
+			f.Write([]byte("\x1b[1;36m" + absPath + "\x1b[0m:"))
 		} else {
-			fmt.Print(absPath)
+			f.Write([]byte(absPath))
 		}
 
 		if instSettings.CheckNormal {
 			if !instSettings.CheckFileName {
-				fmt.Print(strconv.FormatInt(int64(lin.LineNum), 10) + ",")
+				f.Write([]byte(strconv.FormatInt(int64(lin.LineNum), 10) + ","))
 			}
-			fmt.Print(strconv.FormatInt(int64(charIndex), 10))
+			f.Write([]byte(strconv.FormatInt(int64(charIndex), 10)))
 		} else {
-			fmt.Print(strconv.FormatInt(int64(lin.LineNum), 10))
+			f.Write([]byte(strconv.FormatInt(int64(lin.LineNum), 10)))
 		}
-		fmt.Print(":")
+		f.Write([]byte(":"))
 	}
 
 	coloredPrinted := 0
 	splitLine := strings.Split(lin.Line, "")
 	for i := 0; i < len(splitLine); i++ {
 		if coloredPrinted < len(lin.CharNum) && i == lin.CharNum[coloredPrinted] && instSettings.ShowColor {
-			fmt.Print("\x1b[1;31m" + string(splitLine[i]))
+			f.Write([]byte("\x1b[1;31m" + string(splitLine[i])))
 			coloredPrinted++
 		} else if !instSettings.ShowColor {
-			fmt.Print(string(splitLine[i]))
+			f.Write([]byte(string(splitLine[i])))
 		} else {
-			fmt.Print("\x1b[0m" + string(splitLine[i]))
+			f.Write([]byte("\x1b[0m" + string(splitLine[i])))
 		}
 	}
+
 	if !instSettings.ShowColor {
-		fmt.Print("\n")
+		f.Write([]byte("\n"))
 	} else {
-		fmt.Print("\x1b[0m\n")
+		f.Write([]byte("\x1b[0m\n"))
 	}
 }
