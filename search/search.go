@@ -12,6 +12,7 @@ func FindExact(line *string, searchPattern string) (bool, []int) {
 	if line == nil {
 		return false, []int{}
 	}
+
 	splitLine := strings.Split(*line, "")
 	splitPattern := strings.Split(searchPattern, "")
 	if len(splitLine) == 0 || len(splitPattern) == 0 {
@@ -45,6 +46,7 @@ func FindChars(line *string, searchPattern string) (bool, []int) {
 	if line == nil {
 		return false, []int{}
 	}
+
 	splitLine := strings.Split(*line, "")
 	splitPattern := strings.Split(searchPattern, "")
 	if len(splitLine) == 0 || len(splitPattern) == 0 {
@@ -72,6 +74,7 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 	if line == nil {
 		return false, []int{}
 	}
+
 	splitLine := strings.Split(*line, "")
 	splitPattern := strings.Split(searchPattern, "")
 	if len(splitLine) == 0 || len(splitPattern) == 0 {
@@ -148,6 +151,9 @@ func FindTextInBuff(buffIn *string, settingsIn Settings) []Location {
 		}
 		if found {
 			locationList = append(locationList, Location{Path: "", Line: lineIter, LineNum: i, CharNum: index})
+			if settingsIn.CheckFirst {
+				return locationList
+			}
 		}
 	}
 
@@ -161,6 +167,9 @@ func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 		found, index := FindTextInLine(&fileName, &SettingsIn)
 		if found {
 			locationList = append(locationList, Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index})
+			if SettingsIn.CheckFirst {
+				return locationList
+			}
 		}
 		return locationList
 	}
@@ -182,6 +191,9 @@ func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 		found, index := FindTextInLine(&(fileLines[i]), &SettingsIn)
 		if found {
 			locationList = append(locationList, Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index})
+			if SettingsIn.CheckFirst {
+				return locationList
+			}
 		}
 	}
 

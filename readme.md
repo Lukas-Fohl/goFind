@@ -89,14 +89,11 @@ cd goFind && sudo make install
  - [ ] rewrite output!!!!!!!!!!!!!!
  - [x] no colors as flag!!!!!!!!!!!!!!
  - [x] case sensitive
- - [ ] star pattern?????????????
-   - pattern-transformer:
-     - \ as escape for * (when using as normal)
-     - * search for exact (between *)
  - [x] check file permissions
  - [x] replace panic with print when needed
  - [x] when looking at single file and is binary the tell that is binary
  - [x] oom error!!!!!!!!!!!!!
- - [ ] readd gorutines!!!!!!!!!!!!!
+ - [x] readd gorutines!!!!!!!!!!!!!
  - [ ] rework flags?????????????
+ - [ ] add flag test
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))

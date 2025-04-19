@@ -20,9 +20,12 @@ type Settings struct {
 	CheckNormal        bool
 	CheckFileName      bool
 	CheckCaseSensitive bool
+	CheckFirst         bool
 	ShowInfo           bool
 	ShowColor          bool
+	ShowPathOnly       bool
 	PipeInput          bool
+	ReadPipeFileList   bool
 	Path               string
 	PathDepth          int
 	SearchPattern      string
@@ -44,9 +47,12 @@ func DefaultSettings() Settings {
 		CheckNormal:        true,
 		CheckFileName:      false,
 		CheckCaseSensitive: true,
+		CheckFirst:         false,
 		ShowInfo:           true,
 		ShowColor:          true,
+		ShowPathOnly:       false,
 		PipeInput:          false,
+		ReadPipeFileList:   false,
 		PathDepth:          0,
 		Path:               "",
 		SearchPattern:      "",
@@ -87,6 +93,12 @@ func FlagHandle(args []string) Settings {
 			instSettings.ShowColor = false
 		case "-s":
 			instSettings.CheckCaseSensitive = false
+		case "-fl":
+			instSettings.ReadPipeFileList = true
+		case "-po":
+			instSettings.ShowPathOnly = true
+		case "-cf":
+			instSettings.CheckFirst = true
 		case "-l":
 			instSettings.LevelRest = true
 			if i < len(args)-1 {
@@ -144,27 +156,43 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
+
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		n, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			panic(err)
 		}
+
 		if !utf8.ValidString(string(n)) {
 			fmt.Println("Error: pipe input not valid utf8")
 			os.Exit(-1)
 		}
+
 		instSettings.PipeInput = true
 		pipe = string(n)
 	}
 
 	if instSettings.PipeInput {
-		wg.Add(1)
-		go func() {
-			for _, res := range FindTextInBuff(&pipe, instSettings) {
+		if instSettings.ReadPipeFileList {
+			wg.Add(1)
+			go func() {
 				defer wg.Done()
-				PrintResult(res, instSettings)
-			}
-		}()
+				lines := strings.Split(pipe, "\n")
+				for _, i := range lines[:len(lines)-1] {
+					for _, res := range FindTextInFile(i, instSettings) {
+						PrintResult(res, instSettings)
+					}
+				}
+			}()
+		} else {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				for _, res := range FindTextInBuff(&pipe, instSettings) {
+					PrintResult(res, instSettings)
+				}
+			}()
+		}
 
 	} else {
 		dat, err := os.Stat(instSettings.Path)
@@ -190,6 +218,9 @@ func Start() {
 							defer wg.Done()
 							for _, res := range FindTextInFile(pathIn, instSettings) {
 								PrintResult(res, instSettings)
+								if instSettings.CheckFirst {
+									break
+								}
 							}
 						}()
 					}
@@ -203,8 +234,8 @@ func Start() {
 		case pathType.IsRegular():
 			wg.Add(1)
 			go func() {
+				defer wg.Done()
 				for _, res := range FindTextInFile(instSettings.Path, instSettings) {
-					defer wg.Done()
 					PrintResult(res, instSettings)
 				}
 			}()

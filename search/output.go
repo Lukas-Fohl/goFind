@@ -19,22 +19,29 @@ func PrintResult(lin Location, instSettings Settings) {
 		return
 	}
 
-	if !instSettings.ShowInfo {
-		f.Write([]byte(lin.Line + "\n"))
-		return
-	}
+	//if !instSettings.ShowInfo {
+	//	f.Write([]byte(lin.Line + "\n"))
+	//	return
+	//}
 
 	absPath, err := filepath.Abs(lin.Path)
 	if err != nil {
 		panic(err)
 	}
 
-	if !instSettings.PipeInput {
+	if !instSettings.PipeInput && instSettings.ShowInfo {
 		if instSettings.ShowColor {
-			f.Write([]byte("\x1b[1;36m" + absPath + "\x1b[0m:"))
+			f.Write([]byte("\x1b[1;36m" + absPath + "\x1b[0m"))
 		} else {
 			f.Write([]byte(absPath))
 		}
+
+		if instSettings.ShowPathOnly {
+			f.Write([]byte(string("\n")))
+			return
+		}
+
+		f.Write([]byte(string(":")))
 
 		if instSettings.CheckNormal {
 			if !instSettings.CheckFileName {
@@ -44,7 +51,12 @@ func PrintResult(lin Location, instSettings Settings) {
 		} else {
 			f.Write([]byte(strconv.FormatInt(int64(lin.LineNum), 10)))
 		}
+
 		f.Write([]byte(":"))
+	}
+
+	if instSettings.ShowPathOnly {
+		return
 	}
 
 	coloredPrinted := 0
