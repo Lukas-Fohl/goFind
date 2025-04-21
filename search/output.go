@@ -56,6 +56,9 @@ func PrintResult(lin Location, instSettings Settings) {
 	}
 
 	if instSettings.ShowPathOnly {
+		if instSettings.PipeInput {
+			f.Write([]byte(string("piped input has no path\n")))
+		}
 		return
 	}
 

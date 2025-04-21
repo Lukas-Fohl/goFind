@@ -40,13 +40,16 @@ cd goFind && sudo make install
  - read from piped input
 <br></br>
  - search recursive in dir for file content (with limit)
+ - search given file-list
 <br></br>
  - check for exact input
  - check for fuzzy input
  - check for letters in line
  - check with/with out case sensitive
+ - check only for first occurrance
 <br></br>
 - output with and without color/info
+- output ony path of pattern
 
 
 ### Flags:
@@ -58,12 +61,18 @@ cd goFind && sudo make install
     - check if letters in line
   - `-c`:
     - input can have 1 letter changed (missing, added, different)
+  - `-s`:
+    - not case sensitive
+  - `-fl`:
+    - assumes input to be list of file-paths from stdin and searches those for a given patern (only works with piped input)
+  - `-po`:
+    - prints only path of the result
+  - `cf`:
+    - checks only for the first occurrence of an pattern in a file
   - `-n`:
     - no info in output, just the line
   - `-t`:
     - removes color from output
-  - `-s`:
-    - not case sensitive
 
 ## Tests:
  - `go test ./tests -v`
@@ -95,5 +104,7 @@ cd goFind && sudo make install
  - [x] oom error!!!!!!!!!!!!!
  - [x] readd gorutines!!!!!!!!!!!!!
  - [ ] rework flags?????????????
- - [ ] add flag test
+ - [x] add flag test
+ - [x] file list, check if len(string) > 0
+ - [ ] star pattern?????????????
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))

@@ -61,8 +61,12 @@ func TestFlag(t *testing.T) {
 				CheckNormal:        false,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
 				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -79,8 +83,12 @@ func TestFlag(t *testing.T) {
 				CheckNormal:        true,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
 				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -97,8 +105,12 @@ func TestFlag(t *testing.T) {
 				CheckNormal:        false,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
 				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -113,10 +125,14 @@ func TestFlag(t *testing.T) {
 				CheckLetters:       false, //-i
 				CheckFuzzy:         false, //-c
 				CheckNormal:        true,
-				CheckFileName:      true, //-f
-				CheckCaseSensitive: true, //-s
-				ShowInfo:           true, //-n
-				ShowColor:          true, //-t
+				CheckFileName:      true,  //-f
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
+				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -133,8 +149,12 @@ func TestFlag(t *testing.T) {
 				CheckNormal:        true,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: false, //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
 				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -151,8 +171,12 @@ func TestFlag(t *testing.T) {
 				CheckNormal:        true,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           false, //-n
 				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -169,8 +193,78 @@ func TestFlag(t *testing.T) {
 				CheckNormal:        true,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
 				ShowColor:          false, //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
+			},
+		},
+		{
+			name:    "check first flag",
+			flagsIn: []string{"main", "package", "-cf"},
+			result: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         true,  //-cf
+				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
+			},
+		},
+		{
+			name:    "show path only flag",
+			flagsIn: []string{"main", "package", "-po"},
+			result: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
+				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       true,  //-po
+				PipeInput:          false,
+				ReadPipeFileList:   false, //-fl
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "",
+			},
+		},
+		{
+			name:    "check file-list flag",
+			flagsIn: []string{"main", "package", "-fl"},
+			result: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        true,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
+				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          false,
+				ReadPipeFileList:   true, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "",
@@ -196,25 +290,38 @@ func TestFlag(t *testing.T) {
 				t.Error("wrong -c handle")
 			}
 
-			if res.CheckFileName != tc.result.CheckFileName {
-				t.Error("wrong -f handle")
+			if res.CheckNormal != tc.result.CheckNormal {
+				t.Error("normal flag not set")
 			}
 
-			if res.ShowInfo != tc.result.ShowInfo {
-				t.Error("wrong -n handle")
+			if res.CheckFileName != tc.result.CheckFileName {
+				t.Error("wrong -f handle")
 			}
 
 			if res.CheckCaseSensitive != tc.result.CheckCaseSensitive {
 				t.Error("wrong -s handle")
 			}
 
-			if res.CheckNormal != tc.result.CheckNormal {
-				t.Error("normal flag not set")
+			if res.CheckFirst != tc.result.CheckFirst {
+				t.Error("wrong -cf handle")
+			}
+
+			if res.ShowInfo != tc.result.ShowInfo {
+				t.Error("wrong -n handle")
 			}
 
 			if res.ShowColor != tc.result.ShowColor {
 				t.Error("wrong -t handle")
 			}
+
+			if res.ShowPathOnly != tc.result.ShowPathOnly {
+				t.Error("wrong -po handle")
+			}
+
+			if res.ReadPipeFileList != tc.result.ReadPipeFileList {
+				t.Error("wrong -fl handle")
+			}
+
 		})
 	}
 }

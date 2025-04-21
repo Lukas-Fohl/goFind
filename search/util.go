@@ -177,10 +177,14 @@ func Start() {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				lines := strings.Split(pipe, "\n")
-				for _, i := range lines[:len(lines)-1] {
-					for _, res := range FindTextInFile(i, instSettings) {
-						PrintResult(res, instSettings)
+				for _, i := range strings.Split(pipe, "\n") {
+					if len(i) > 0 {
+						for _, res := range FindTextInFile(i, instSettings) {
+							PrintResult(res, instSettings)
+							if instSettings.CheckFirst {
+								break
+							}
+						}
 					}
 				}
 			}()
@@ -190,6 +194,9 @@ func Start() {
 				defer wg.Done()
 				for _, res := range FindTextInBuff(&pipe, instSettings) {
 					PrintResult(res, instSettings)
+					if instSettings.CheckFirst {
+						break
+					}
 				}
 			}()
 		}
