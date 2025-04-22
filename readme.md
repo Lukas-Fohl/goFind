@@ -108,3 +108,6 @@ cd goFind && sudo make install
  - [x] file list, check if len(string) > 0
  - [ ] star pattern?????????????
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))
+ - [ ] no tint with -po flag
+ - [ ] eol pattern
+ - [ ] panic in debug?????????????

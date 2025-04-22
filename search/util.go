@@ -121,7 +121,13 @@ func FlagHandle(args []string) Settings {
 
 				fi, err := os.Stdin.Stat()
 				if err != nil {
-					panic(err)
+					fmt.Println(err)
+					os.Exit(-1)
+				}
+
+				if len(args[i]) > 0 && args[i][0] == '-' {
+					fmt.Println("Error: flag not found: " + args[i])
+					os.Exit(-1)
 				}
 
 				if fi.Mode()&os.ModeNamedPipe != 0 {
@@ -129,7 +135,7 @@ func FlagHandle(args []string) Settings {
 					os.Exit(-1)
 				}
 			} else {
-				fmt.Println("Error: flag not found")
+				fmt.Println("Error: flag not found: " + args[i])
 				os.Exit(-1)
 			}
 		}
@@ -137,7 +143,8 @@ func FlagHandle(args []string) Settings {
 
 	absPath, err := filepath.Abs(instSettings.Path)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(-1)
 	}
 
 	instSettings.Path = absPath
@@ -154,13 +161,15 @@ func Start() {
 	var pipe string
 	fi, err := os.Stdin.Stat()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		n, err := io.ReadAll(os.Stdin)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(-1)
 		}
 
 		if !utf8.ValidString(string(n)) {
@@ -204,7 +213,8 @@ func Start() {
 	} else {
 		dat, err := os.Stat(instSettings.Path)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(-1)
 		}
 
 		switch pathType := dat.Mode(); {
@@ -235,7 +245,8 @@ func Start() {
 				})
 
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
+				os.Exit(-1)
 			}
 
 		case pathType.IsRegular():

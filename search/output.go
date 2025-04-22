@@ -2,6 +2,7 @@ package finder
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -26,10 +27,11 @@ func PrintResult(lin Location, instSettings Settings) {
 
 	absPath, err := filepath.Abs(lin.Path)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(-1)
 	}
 
-	if !instSettings.PipeInput && instSettings.ShowInfo {
+	if (!instSettings.PipeInput || instSettings.ReadPipeFileList) && instSettings.ShowInfo {
 		if instSettings.ShowColor {
 			f.Write([]byte("\x1b[1;36m" + absPath + "\x1b[0m"))
 		} else {
@@ -56,7 +58,7 @@ func PrintResult(lin Location, instSettings Settings) {
 	}
 
 	if instSettings.ShowPathOnly {
-		if instSettings.PipeInput {
+		if instSettings.PipeInput && !instSettings.ReadPipeFileList {
 			f.Write([]byte(string("piped input has no path\n")))
 		}
 		return
