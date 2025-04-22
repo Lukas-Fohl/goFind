@@ -2,27 +2,27 @@
 <br></br>
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
-- [Requirements:](#requirements)
-- [Installation:](#installation)
-- [Usage:](#usage)
-- [Features:](#features)
-  - [Flags:](#flags)
-- [Tests:](#tests)
-- [TODO:](#todo)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Features](#features)
+  - [Flags](#flags)
+- [Tests](#tests)
+- [TODO](#todo)
 
-## Requirements:
+## Requirements
  - git
  - make
  - go `>=1.22.2`
 
-## Installation:
+## Installation
  - linux:
 ```bash
 git clone github.com/lukas-fohl/goFind
 cd goFind && sudo make install
 ```
 
-## Usage:
+## Usage
  - `gfind [path] [pattern] [flags]`
  - `gfind [file] [pattern] [flags]`
  - `gfind [pattern] [flags]` (assumes current path)
@@ -34,7 +34,7 @@ cd goFind && sudo make install
    - `cat main.go | gfind "package"`
    - `gfind ".go" -f`
 
-## Features:
+## Features
  - read from file
  - read from file name
  - read from piped input
@@ -52,7 +52,7 @@ cd goFind && sudo make install
 - output ony path of pattern
 
 
-### Flags:
+### Flags
   - `-l`:
     - level depth of file tree search
   - `-f`:
@@ -74,12 +74,12 @@ cd goFind && sudo make install
   - `-t`:
     - removes color from output
 
-## Tests:
+## Tests
  - `go test ./tests -v`
  - for each search
  - check flag function behaviour with sameples
 
-## TODO:
+## TODO
  - [x] impl fuzzy
  - [x] impl file name search
  - [x] split file into: main, search, output
@@ -88,14 +88,11 @@ cd goFind && sudo make install
  - [x] check for binary file
  - [ ] change flags???
  <br></br>
- - [x] file name 
+ - [x] file name
  - [x] fix fuzzy char index
  - [x] fix indices name to indices
  - [x] get input from buffer (some | goFind "test")
- - [ ] get amount in file?????????????
  - [x] no info output
- - [ ] change var names
- - [ ] rewrite output!!!!!!!!!!!!!!
  - [x] no colors as flag!!!!!!!!!!!!!!
  - [x] case sensitive
  - [x] check file permissions
@@ -103,11 +100,18 @@ cd goFind && sudo make install
  - [x] when looking at single file and is binary the tell that is binary
  - [x] oom error!!!!!!!!!!!!!
  - [x] readd gorutines!!!!!!!!!!!!!
- - [ ] rework flags?????????????
  - [x] add flag test
  - [x] file list, check if len(string) > 0
- - [ ] star pattern?????????????
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))
- - [ ] no tint with -po flag
+ - [x] no tint with -po flag
+ - [ ] change var names
+ - [ ] get amount in file?????????????
+ - [ ] rewrite output!!!!!!!!!!!!!!
+ - [ ] rework flags?????????????
+ - [ ] star pattern?????????????
  - [ ] eol pattern
  - [ ] panic in debug?????????????
+ - [ ] DON'T ADD MORE TODOS
+ - [x] double to lower?
+ - [x] error when using -f in piped
+ - [x] fuzzy bug

@@ -150,6 +150,20 @@ func TestFindFuzzy(t *testing.T) {
 			wantFind: true,
 			wantLen:  5,
 		},
+		{
+			name:     "simple match other",
+			text:     "sdfskdfjsakjfaks jtest adsfasfsafaf",
+			pattern:  "teest",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "simple match other",
+			text:     "test",
+			pattern:  "test",
+			wantFind: true,
+			wantLen:  4,
+		},
 	}
 
 	for _, tc := range testCases {

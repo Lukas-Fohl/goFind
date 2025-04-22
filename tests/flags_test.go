@@ -239,7 +239,7 @@ func TestFlag(t *testing.T) {
 				CheckCaseSensitive: true,  //-s
 				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
-				ShowColor:          true,  //-t
+				ShowColor:          false, //-t
 				ShowPathOnly:       true,  //-po
 				PipeInput:          false,
 				ReadPipeFileList:   false, //-fl

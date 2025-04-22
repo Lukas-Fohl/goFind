@@ -97,6 +97,7 @@ func FlagHandle(args []string) Settings {
 			instSettings.ReadPipeFileList = true
 		case "-po":
 			instSettings.ShowPathOnly = true
+			instSettings.ShowColor = false
 		case "-cf":
 			instSettings.CheckFirst = true
 		case "-l":
@@ -166,6 +167,11 @@ func Start() {
 	}
 
 	if fi.Mode()&os.ModeNamedPipe != 0 {
+		if instSettings.CheckFileName {
+			fmt.Println("Error: -f in piped input")
+			os.Exit(-1)
+		}
+
 		n, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			fmt.Println(err)

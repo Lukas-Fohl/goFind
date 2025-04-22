@@ -87,11 +87,9 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 	}
 
 	//search with one char added somewhere
-	for i := 0; i < len(splitPattern); i++ {
-		found, indices := FindChars(line, searchPattern)
-		if found && indices[len(indices)-1]-indices[0] <= len(splitPattern) {
-			return found, indices
-		}
+	found, indices = FindChars(line, searchPattern)
+	if found && (indices[len(indices)-1]-indices[0]) <= len(splitPattern) {
+		return found, indices
 	}
 
 	//search pattern with each char missing -> one wrong char or one missing
@@ -100,6 +98,11 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 		found, indices := FindChars(line, newSearch)
 		if found && indices[len(indices)-1]-indices[0] < len(splitPattern) {
 			return found, indices
+		} else {
+			found, indices = FindExact(line, newSearch)
+			if found {
+				return found, indices
+			}
 		}
 	}
 
@@ -142,13 +145,7 @@ func FindTextInBuff(buffIn *string, settingsIn Settings) []Location {
 	for i, lineIter := range fileLines {
 		var found bool
 		var index []int
-		if !settingsIn.CheckCaseSensitive {
-			settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
-			temp := strings.ToLower(lineIter)
-			found, index = FindTextInLine(&temp, &settingsIn)
-		} else {
-			found, index = FindTextInLine(&lineIter, &settingsIn)
-		}
+		found, index = FindTextInLine(&lineIter, &settingsIn)
 		if found {
 			locationList = append(locationList, Location{Path: "", Line: lineIter, LineNum: i, CharNum: index})
 			if settingsIn.CheckFirst {
