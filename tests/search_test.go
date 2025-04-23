@@ -330,3 +330,89 @@ func TestCaseSearch(t *testing.T) {
 	}
 }
 */
+
+func TestFindResticted(t *testing.T) {
+	testCases := []struct {
+		name     string
+		text     string
+		pattern  string
+		wantFind bool
+		wantLen  int
+	}{
+		{
+			name:     "simple match",
+			text:     "package",
+			pattern:  "p\\*age",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "simple match inside",
+			text:     "ABCDEF",
+			pattern:  "\\*CD\\*",
+			wantFind: true,
+			wantLen:  2,
+		},
+		{
+			name:     "simple match around",
+			text:     "ABCDEF",
+			pattern:  "AB\\*DE",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "no match end",
+			text:     "ABCDEF",
+			pattern:  "\\*FE\\*",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "no match switched",
+			text:     "ABCDEF",
+			pattern:  "\\*EF\\*AB",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple match end end",
+			text:     "ABCDEF",
+			pattern:  "EF\\~",
+			wantFind: true,
+			wantLen:  2,
+		},
+		{
+			name:     "simple match end not end",
+			text:     "ABCDEF",
+			pattern:  "AB\\~",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple mismatch end end",
+			text:     "ABCDEF",
+			pattern:  "FE\\~",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple match all",
+			text:     "ABCDEF",
+			pattern:  "AB\\*EF\\~",
+			wantFind: true,
+			wantLen:  4,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			found, indices := finder.FindRestriced(&tc.text, tc.pattern)
+			if found != tc.wantFind {
+				t.Errorf("got found=%v, want %v", found, tc.wantFind)
+			}
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
+			}
+		})
+	}
+}

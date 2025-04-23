@@ -112,6 +112,7 @@ cd goFind && sudo make install
  - [ ] eol pattern
  - [ ] panic in debug?????????????
  - [ ] DON'T ADD MORE TODOS
+ - [ ] error messages
  - [x] double to lower?
  - [x] error when using -f in piped
  - [x] fuzzy bug
