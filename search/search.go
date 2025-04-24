@@ -110,8 +110,28 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 }
 
 func FindRestriced(line *string, searchPattern string) (bool, []int) {
-	starSplit := strings.Split(searchPattern, "\\*")
-	endSplit := strings.Split(searchPattern, "\\~")
+	starSplit := []string{""}
+	endSplit := []string{""}
+
+	splitSearch := strings.Split(searchPattern, "")
+	for i := 0; i < len(splitSearch); i++ {
+		switch splitSearch[i] {
+		case "\\":
+			if i < len(splitSearch)-1 {
+				starSplit[len(starSplit)-1] += splitSearch[i+1]
+				endSplit[len(endSplit)-1] += splitSearch[i+1]
+				i++
+			}
+		case "*":
+			starSplit = append(starSplit, "")
+		case "~":
+			endSplit = append(endSplit, "")
+		default:
+			starSplit[len(starSplit)-1] += splitSearch[i]
+			endSplit[len(endSplit)-1] += splitSearch[i]
+		}
+	}
+
 	if len(endSplit) > 2 {
 		fmt.Println("Error: to many end-symbols")
 		os.Exit(-1)
@@ -120,14 +140,25 @@ func FindRestriced(line *string, searchPattern string) (bool, []int) {
 		os.Exit(-1)
 	}
 
-	//REM \\~ from star search if included
 	listOfFound := [][]int{}
 	if len(starSplit) > 1 {
+		remainingLine := *line // Keep track of the remaining part of the line
+		offset := 0            // Offset to adjust indices relative to the original string
+
 		for _, elem := range starSplit {
 			if len(elem) > 0 {
-				found, indices := FindExact(line, strings.ReplaceAll(elem, "\\~", ""))
+				found, indices := FindExact(&remainingLine, elem)
 				if found {
+					// Adjust indices to be relative to the original string
+					for i := range indices {
+						indices[i] += offset
+					}
 					listOfFound = append(listOfFound, indices)
+
+					// Update the remaining line and offset
+					lastMatchEnd := indices[len(indices)-1] + 1
+					remainingLine = remainingLine[lastMatchEnd-offset:]
+					offset = lastMatchEnd
 				} else {
 					return false, []int{}
 				}
@@ -194,23 +225,28 @@ func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
 	}
 
 	//call restriced search function
-	starSplit := strings.Split(settingsIn.SearchPattern, "\\*")
-	endSplit := strings.Split(settingsIn.SearchPattern, "\\~")
-	if len(starSplit) > 1 || len(endSplit) > 1 {
+	lenStarSplit := len(strings.Split(settingsIn.SearchPattern, "*"))
+	lenEndSplit := len(strings.Split(settingsIn.SearchPattern, "~"))
+	lenEscStar := len(strings.Split(settingsIn.SearchPattern, "\\*"))
+	lenEscEnd := len(strings.Split(settingsIn.SearchPattern, "\\~"))
+	if lenStarSplit > lenEscStar || lenEndSplit > lenEscEnd {
 		return FindRestriced(&tempLine, settingsIn.SearchPattern)
 	}
 
+	tempSearch := strings.ReplaceAll(settingsIn.SearchPattern, "\\~", "~")
+	tempSearch = strings.ReplaceAll(tempSearch, "\\*", "*")
+
 	//check for right search
 	if settingsIn.CheckNormal {
-		return FindExact(&tempLine, settingsIn.SearchPattern)
+		return FindExact(&tempLine, tempSearch)
 	}
 
 	if settingsIn.CheckLetters {
-		return FindChars(&tempLine, settingsIn.SearchPattern)
+		return FindChars(&tempLine, tempSearch)
 	}
 
 	if settingsIn.CheckFuzzy {
-		return FindFuzzy(&tempLine, settingsIn.SearchPattern)
+		return FindFuzzy(&tempLine, tempSearch)
 	}
 
 	return false, []int{}

@@ -179,6 +179,156 @@ func TestFindFuzzy(t *testing.T) {
 	}
 }
 
+func TestFindResticted(t *testing.T) {
+	testCases := []struct {
+		name     string
+		text     string
+		pattern  string
+		wantFind bool
+		wantLen  int
+	}{
+		{
+			name:     "simple match",
+			text:     "package",
+			pattern:  "p*age",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "simple match inside",
+			text:     "ABCDEF",
+			pattern:  "*CD*",
+			wantFind: true,
+			wantLen:  2,
+		},
+		{
+			name:     "simple match around",
+			text:     "ABCDEF",
+			pattern:  "AB*DE",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "no match end",
+			text:     "ABCDEF",
+			pattern:  "*FE*",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "no match switched",
+			text:     "ABCDEF",
+			pattern:  "*EF*AB",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple match end end",
+			text:     "ABCDEF",
+			pattern:  "EF~",
+			wantFind: true,
+			wantLen:  2,
+		},
+		{
+			name:     "simple match end not end",
+			text:     "ABCDEF",
+			pattern:  "AB~",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple mismatch end end",
+			text:     "ABCDEF",
+			pattern:  "FE~",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple match all",
+			text:     "ABCDEF",
+			pattern:  "AB*EF~",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "simple escape",
+			text:     "ABCDEF",
+			pattern:  "AB\\*EF\\~",
+			wantFind: false,
+			wantLen:  0,
+		},
+		{
+			name:     "simple find match end",
+			text:     "ABCDEF~",
+			pattern:  "EF\\~",
+			wantFind: true,
+			wantLen:  3,
+		},
+		{
+			name:     "simple find match star",
+			text:     "ABCDEF*",
+			pattern:  "EF\\*",
+			wantFind: true,
+			wantLen:  3,
+		},
+		{
+			name:     "simple find match star + end",
+			text:     "ABCD*EF~",
+			pattern:  "CD\\*EF\\~",
+			wantFind: true,
+			wantLen:  6,
+		},
+		{
+			name:     "simple in check star",
+			text:     "test~test",
+			pattern:  "st*te",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "simple in check star2",
+			text:     "testtest",
+			pattern:  "st*te",
+			wantFind: true,
+			wantLen:  4,
+		},
+		{
+			name:     "simple in check star end",
+			text:     "test~test",
+			pattern:  "st*test~",
+			wantFind: true,
+			wantLen:  6,
+		},
+		{
+			name:     "simple in check star end symbol",
+			text:     "test~test",
+			pattern:  "st*\\~test~",
+			wantFind: true,
+			wantLen:  7,
+		},
+		{
+			name:     "simple in check star end symbol double",
+			text:     "test~test",
+			pattern:  "st*\\~*test~",
+			wantFind: true,
+			wantLen:  7,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			found, indices := finder.FindRestriced(&tc.text, tc.pattern)
+			if found != tc.wantFind {
+				t.Errorf("got found=%v, want %v", found, tc.wantFind)
+				t.Error(tc.pattern)
+			}
+			if len(indices) != tc.wantLen {
+				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
+			}
+		})
+	}
+}
+
 func TestFindExactProp(t *testing.T) {
 	max := 20
 	sta := 5
@@ -330,89 +480,3 @@ func TestCaseSearch(t *testing.T) {
 	}
 }
 */
-
-func TestFindResticted(t *testing.T) {
-	testCases := []struct {
-		name     string
-		text     string
-		pattern  string
-		wantFind bool
-		wantLen  int
-	}{
-		{
-			name:     "simple match",
-			text:     "package",
-			pattern:  "p\\*age",
-			wantFind: true,
-			wantLen:  4,
-		},
-		{
-			name:     "simple match inside",
-			text:     "ABCDEF",
-			pattern:  "\\*CD\\*",
-			wantFind: true,
-			wantLen:  2,
-		},
-		{
-			name:     "simple match around",
-			text:     "ABCDEF",
-			pattern:  "AB\\*DE",
-			wantFind: true,
-			wantLen:  4,
-		},
-		{
-			name:     "no match end",
-			text:     "ABCDEF",
-			pattern:  "\\*FE\\*",
-			wantFind: false,
-			wantLen:  0,
-		},
-		{
-			name:     "no match switched",
-			text:     "ABCDEF",
-			pattern:  "\\*EF\\*AB",
-			wantFind: false,
-			wantLen:  0,
-		},
-		{
-			name:     "simple match end end",
-			text:     "ABCDEF",
-			pattern:  "EF\\~",
-			wantFind: true,
-			wantLen:  2,
-		},
-		{
-			name:     "simple match end not end",
-			text:     "ABCDEF",
-			pattern:  "AB\\~",
-			wantFind: false,
-			wantLen:  0,
-		},
-		{
-			name:     "simple mismatch end end",
-			text:     "ABCDEF",
-			pattern:  "FE\\~",
-			wantFind: false,
-			wantLen:  0,
-		},
-		{
-			name:     "simple match all",
-			text:     "ABCDEF",
-			pattern:  "AB\\*EF\\~",
-			wantFind: true,
-			wantLen:  4,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindRestriced(&tc.text, tc.pattern)
-			if found != tc.wantFind {
-				t.Errorf("got found=%v, want %v", found, tc.wantFind)
-			}
-			if len(indices) != tc.wantLen {
-				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
-			}
-		})
-	}
-}
