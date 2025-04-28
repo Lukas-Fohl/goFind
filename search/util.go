@@ -100,6 +100,9 @@ func FlagHandle(args []string) Settings {
 			instSettings.ShowColor = false
 		case "-cf":
 			instSettings.CheckFirst = true
+		case "--help":
+			fmt.Println("diddle daddle duddle")
+			os.Exit(-1)
 		case "-l":
 			instSettings.LevelRest = true
 			if i < len(args)-1 {
@@ -188,13 +191,13 @@ func Start() {
 	}
 
 	if instSettings.PipeInput {
-		if instSettings.ReadPipeFileList {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				for _, i := range strings.Split(pipe, "\n") {
-					if len(i) > 0 {
-						for _, res := range FindTextInFile(i, instSettings) {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if instSettings.ReadPipeFileList {
+				for _, lineIter := range strings.Split(pipe, "\n") {
+					if len(lineIter) > 0 {
+						for _, res := range FindTextInFile(lineIter, instSettings) {
 							PrintResult(res, instSettings)
 							if instSettings.CheckFirst {
 								break
@@ -202,20 +205,15 @@ func Start() {
 						}
 					}
 				}
-			}()
-		} else {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				for _, res := range FindTextInBuff(&pipe, instSettings) {
+			} else {
+				for _, res := range FindTextInBuff(pipe, instSettings) {
 					PrintResult(res, instSettings)
 					if instSettings.CheckFirst {
 						break
 					}
 				}
-			}()
-		}
-
+			}
+		}()
 	} else {
 		dat, err := os.Stat(instSettings.Path)
 		if err != nil {

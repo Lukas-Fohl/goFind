@@ -8,12 +8,8 @@ import (
 	"unicode/utf8"
 )
 
-func FindExact(line *string, searchPattern string) (bool, []int) {
-	if line == nil {
-		return false, []int{}
-	}
-
-	splitLine := strings.Split(*line, "")
+func FindExact(line string, searchPattern string) (bool, []int) {
+	splitLine := strings.Split(line, "")
 	splitPattern := strings.Split(searchPattern, "")
 	if len(splitLine) == 0 || len(splitPattern) == 0 {
 		return false, []int{}
@@ -42,12 +38,8 @@ func FindExact(line *string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
-func FindChars(line *string, searchPattern string) (bool, []int) {
-	if line == nil {
-		return false, []int{}
-	}
-
-	splitLine := strings.Split(*line, "")
+func FindChars(line string, searchPattern string) (bool, []int) {
+	splitLine := strings.Split(line, "")
 	splitPattern := strings.Split(searchPattern, "")
 	if len(splitLine) == 0 || len(splitPattern) == 0 {
 		return false, []int{}
@@ -70,12 +62,8 @@ func FindChars(line *string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
-func FindFuzzy(line *string, searchPattern string) (bool, []int) {
-	if line == nil {
-		return false, []int{}
-	}
-
-	splitLine := strings.Split(*line, "")
+func FindFuzzy(line string, searchPattern string) (bool, []int) {
+	splitLine := strings.Split(line, "")
 	splitPattern := strings.Split(searchPattern, "")
 	if len(splitLine) == 0 || len(splitPattern) == 0 {
 		return false, []int{}
@@ -109,10 +97,11 @@ func FindFuzzy(line *string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
-func FindRestriced(line *string, searchPattern string) (bool, []int) {
+func FindRestriced(line string, searchPattern string) (bool, []int) {
 	starSplit := []string{""}
 	endSplit := []string{""}
 
+	//split string wrt. special character
 	splitSearch := strings.Split(searchPattern, "")
 	for i := 0; i < len(splitSearch); i++ {
 		switch splitSearch[i] {
@@ -140,14 +129,15 @@ func FindRestriced(line *string, searchPattern string) (bool, []int) {
 		os.Exit(-1)
 	}
 
+	//check for findExact of parts split by '*'
 	listOfFound := [][]int{}
 	if len(starSplit) > 1 {
-		remainingLine := *line // Keep track of the remaining part of the line
-		offset := 0            // Offset to adjust indices relative to the original string
+		remainingLine := line // Keep track of the remaining part of the line
+		offset := 0           // Offset to adjust indices relative to the original string
 
 		for _, elem := range starSplit {
 			if len(elem) > 0 {
-				found, indices := FindExact(&remainingLine, elem)
+				found, indices := FindExact(remainingLine, elem)
 				if found {
 					// Adjust indices to be relative to the original string
 					for i := range indices {
@@ -165,6 +155,7 @@ func FindRestriced(line *string, searchPattern string) (bool, []int) {
 			}
 		}
 
+		//check for order
 		lastLast := -1
 		lastFirst := -1
 		for _, elem := range listOfFound {
@@ -175,12 +166,17 @@ func FindRestriced(line *string, searchPattern string) (bool, []int) {
 				return false, []int{}
 			}
 		}
+
+		if len(listOfFound) == 0 {
+			return false, []int{}
+		}
 	}
 
 	if len(starSplit) > 1 {
 		if len(endSplit) > 1 {
-			lofLast := listOfFound[len(listOfFound)-1][len(listOfFound[len(listOfFound)-1])-1]
-			if lofLast == len(*line)-1 {
+			lastElem := listOfFound[len(listOfFound)-1][len(listOfFound[len(listOfFound)-1])-1]
+			if lastElem == len(line)-1 {
+				//concat list
 				returnList := []int{}
 				for _, i := range listOfFound {
 					returnList = append(returnList, i...)
@@ -190,6 +186,7 @@ func FindRestriced(line *string, searchPattern string) (bool, []int) {
 				return false, []int{}
 			}
 		} else {
+			//concat list
 			returnList := []int{}
 			for _, i := range listOfFound {
 				returnList = append(returnList, i...)
@@ -198,29 +195,18 @@ func FindRestriced(line *string, searchPattern string) (bool, []int) {
 		}
 	} else {
 		found, indices := FindExact(line, endSplit[0])
-		if found && indices[len(indices)-1] == len(*line)-1 {
+		if found && indices[len(indices)-1] == len(line)-1 {
 			return found, indices
 		} else {
 			return false, []int{}
 		}
 	}
-
-	/*ops:
-	- no split no end
-	  - ¯\_(ツ)_/¯
-	- no split yes end
-	  - check for exact -> last elem = len-1
-	- yes split no end
-	  - check exact each elem -> no overlap + following -> return union
-	- yes split yes end
-	  - do check for split no end check if last
-	*/
 }
 
-func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
-	tempLine := *line
+func FindTextInLine(line string, settingsIn Settings) (bool, []int) {
+	tempLine := line
 	if !settingsIn.CheckCaseSensitive {
-		tempLine = strings.ToLower(*line)
+		tempLine = strings.ToLower(line)
 		settingsIn.SearchPattern = strings.ToLower(settingsIn.SearchPattern)
 	}
 
@@ -230,7 +216,7 @@ func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
 	lenEscStar := len(strings.Split(settingsIn.SearchPattern, "\\*"))
 	lenEscEnd := len(strings.Split(settingsIn.SearchPattern, "\\~"))
 	if lenStarSplit > lenEscStar || lenEndSplit > lenEscEnd {
-		return FindRestriced(&tempLine, settingsIn.SearchPattern)
+		return FindRestriced(tempLine, settingsIn.SearchPattern)
 	}
 
 	tempSearch := strings.ReplaceAll(settingsIn.SearchPattern, "\\~", "~")
@@ -238,31 +224,31 @@ func FindTextInLine(line *string, settingsIn *Settings) (bool, []int) {
 
 	//check for right search
 	if settingsIn.CheckNormal {
-		return FindExact(&tempLine, tempSearch)
+		return FindExact(tempLine, tempSearch)
 	}
 
 	if settingsIn.CheckLetters {
-		return FindChars(&tempLine, tempSearch)
+		return FindChars(tempLine, tempSearch)
 	}
 
 	if settingsIn.CheckFuzzy {
-		return FindFuzzy(&tempLine, tempSearch)
+		return FindFuzzy(tempLine, tempSearch)
 	}
 
 	return false, []int{}
 }
 
-func FindTextInBuff(buffIn *string, settingsIn Settings) []Location {
+func FindTextInBuff(buffIn string, settingsIn Settings) []Location {
 	locationList := []Location{}
-	if !utf8.ValidString(*buffIn) {
+	if !utf8.ValidString(buffIn) {
 		return locationList
 	}
 
-	fileLines := strings.Split(string(*buffIn), "\n") //get lines
+	fileLines := strings.Split(string(buffIn), "\n") //get lines
 	for i, lineIter := range fileLines {
 		var found bool
 		var index []int
-		found, index = FindTextInLine(&lineIter, &settingsIn)
+		found, index = FindTextInLine(lineIter, settingsIn)
 		if found {
 			locationList = append(locationList, Location{Path: "", Line: lineIter, LineNum: i, CharNum: index})
 			if settingsIn.CheckFirst {
@@ -277,13 +263,15 @@ func FindTextInBuff(buffIn *string, settingsIn Settings) []Location {
 func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 	locationList := []Location{}
 	if SettingsIn.CheckFileName {
+		if SettingsIn.CheckFirst {
+			fmt.Println("Error: check first on file-name search")
+			os.Exit(-1)
+		}
+
 		_, fileName := path.Split(pathIn)
-		found, index := FindTextInLine(&fileName, &SettingsIn)
+		found, index := FindTextInLine(fileName, SettingsIn)
 		if found {
 			locationList = append(locationList, Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index})
-			if SettingsIn.CheckFirst {
-				return locationList
-			}
 		}
 		return locationList
 	}
@@ -293,16 +281,16 @@ func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 		fmt.Println(err)
 	}
 
-	if !utf8.ValidString(string(dat[len(dat)/5:])) {
+	if !utf8.ValidString(string(dat[len(dat)/5:])) { //check for binary-file
 		if pathIn == SettingsIn.Path {
 			fmt.Printf("%s is a binary file\n", pathIn)
 		}
-		return locationList //check for binary-file
+		return locationList
 	}
 
 	fileLines := strings.Split(string(dat), "\n") //get lines
 	for i := 0; i < len(fileLines); i++ {
-		found, index := FindTextInLine(&(fileLines[i]), &SettingsIn)
+		found, index := FindTextInLine((fileLines[i]), SettingsIn)
 		if found {
 			locationList = append(locationList, Location{Path: pathIn, Line: fileLines[i], LineNum: i, CharNum: index})
 			if SettingsIn.CheckFirst {

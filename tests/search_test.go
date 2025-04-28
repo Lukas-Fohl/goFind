@@ -51,7 +51,7 @@ func TestFindExact(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindExact(&tc.text, tc.pattern)
+			found, indices := finder.FindExact(tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
@@ -96,7 +96,7 @@ func TestFindChars(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindChars(&tc.text, tc.pattern)
+			found, indices := finder.FindChars(tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
@@ -168,7 +168,7 @@ func TestFindFuzzy(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindFuzzy(&tc.text, tc.pattern)
+			found, indices := finder.FindFuzzy(tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
@@ -317,7 +317,7 @@ func TestFindResticted(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindRestriced(&tc.text, tc.pattern)
+			found, indices := finder.FindRestriced(tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 				t.Error(tc.pattern)
@@ -362,7 +362,7 @@ func TestFindExactProp(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindExact(&tc.text, tc.pattern)
+			found, indices := finder.FindExact(tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
@@ -402,7 +402,7 @@ func TestFindFuzzyProp(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			found, indices := finder.FindFuzzy(&tc.text, tc.pattern)
+			found, indices := finder.FindFuzzy(tc.text, tc.pattern)
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}

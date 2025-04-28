@@ -18,7 +18,7 @@
 ## Installation
  - linux:
 ```bash
-git clone github.com/lukas-fohl/goFind
+git clone https://github.com/Lukas-Fohl/goFind
 cd goFind && sudo make install
 ```
 
@@ -73,6 +73,8 @@ cd goFind && sudo make install
     - no info in output, just the line
   - `-t`:
     - removes color from output
+  - `--help`:
+    - shows flags and usage
 
 ## Tests
  - `go test ./tests -v`
@@ -83,10 +85,9 @@ cd goFind && sudo make install
  - [x] impl fuzzy
  - [x] impl file name search
  - [x] split file into: main, search, output
- - [ ] write docs
+ - [ ] write docs/examples
  - [x] build test
  - [x] check for binary file
- - [ ] change flags???
  <br></br>
  - [x] file name
  - [x] fix fuzzy char index
@@ -104,15 +105,15 @@ cd goFind && sudo make install
  - [x] file list, check if len(string) > 0
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))
  - [x] no tint with -po flag
- - [ ] change var names
  - [ ] get amount in file?????????????
- - [ ] rewrite output!!!!!!!!!!!!!!
  - [ ] rework flags?????????????
- - [ ] star pattern?????????????
- - [ ] eol pattern
  - [ ] panic in debug?????????????
- - [ ] DON'T ADD MORE TODOS
+ - [x] star pattern?????????????
+ - [x] eol pattern
+ - [ ] rewrite output!!!!!!!!!!!!!!
  - [ ] error messages
+ - [ ] write --help, add to Error
+ - [x] remove pointer to line
  - [x] double to lower?
  - [x] error when using -f in piped
  - [x] fuzzy bug

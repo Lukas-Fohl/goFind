@@ -1,2 +1,3 @@
 abcdefghijklmnopqrstuvwxyzäöüß
 test~test
+test*test
