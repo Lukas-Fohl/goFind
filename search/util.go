@@ -60,7 +60,7 @@ func DefaultSettings() Settings {
 }
 
 func FlagHandle(args []string) Settings {
-	instSettings := DefaultSettings()
+	flagSettings := DefaultSettings()
 
 	if len(args) > 1 && args[1] == "--help" {
 		PrintHelp()
@@ -78,45 +78,45 @@ func FlagHandle(args []string) Settings {
 			os.Exit(-1)
 		}
 
-		instSettings.Path = pathOut
-		instSettings.SearchPattern = args[1]
+		flagSettings.Path = pathOut
+		flagSettings.SearchPattern = args[1]
 	}
 
 	for i := 2; i < len(args) && len(args) > 2; i++ {
 		switch args[i] {
 		case "-i":
-			instSettings.CheckNormal = false
-			instSettings.CheckLetters = true
+			flagSettings.CheckNormal = false
+			flagSettings.CheckLetters = true
 		case "-c":
-			instSettings.CheckNormal = false
-			instSettings.CheckFuzzy = true
+			flagSettings.CheckNormal = false
+			flagSettings.CheckFuzzy = true
 		case "-f":
-			instSettings.CheckFileName = true
+			flagSettings.CheckFileName = true
 		case "-n":
-			instSettings.ShowInfo = false
+			flagSettings.ShowInfo = false
 		case "-t":
-			instSettings.ShowColor = false
+			flagSettings.ShowColor = false
 		case "-s":
-			instSettings.CheckCaseSensitive = false
+			flagSettings.CheckCaseSensitive = false
 		case "-fl":
-			instSettings.ReadPipeFileList = true
+			flagSettings.ReadPipeFileList = true
 		case "-po":
-			instSettings.ShowPathOnly = true
-			instSettings.ShowColor = false
+			flagSettings.ShowPathOnly = true
+			flagSettings.ShowColor = false
 		case "-cf":
-			instSettings.CheckFirst = true
+			flagSettings.CheckFirst = true
 		case "--help":
 			PrintHelp()
 			os.Exit(-1)
 		case "-l":
-			instSettings.LevelRest = true
+			flagSettings.LevelRest = true
 			if i < len(args)-1 {
 				argToInt, err := strconv.Atoi(args[i+1])
 				if err != nil {
 					fmt.Println("Error: no size provided for depth")
 					os.Exit(-1)
 				}
-				instSettings.LevelRestLimit = argToInt
+				flagSettings.LevelRestLimit = argToInt
 				i++
 			} else {
 				fmt.Println("Error: no size provided for depth")
@@ -125,8 +125,8 @@ func FlagHandle(args []string) Settings {
 		default:
 			if i == 2 {
 				//first two must be path and pattern
-				instSettings.Path = args[1]
-				instSettings.SearchPattern = args[2]
+				flagSettings.Path = args[1]
+				flagSettings.SearchPattern = args[2]
 
 				fi, err := os.Stdin.Stat()
 				if err != nil {
@@ -150,20 +150,20 @@ func FlagHandle(args []string) Settings {
 		}
 	}
 
-	absPath, err := filepath.Abs(instSettings.Path)
+	absPath, err := filepath.Abs(flagSettings.Path)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
 
-	instSettings.Path = absPath
-	instSettings.PathDepth = strings.Count(path.Join(instSettings.Path), string(os.PathSeparator))
+	flagSettings.Path = absPath
+	flagSettings.PathDepth = strings.Count(path.Join(flagSettings.Path), string(os.PathSeparator))
 
-	return instSettings
+	return flagSettings
 }
 
 func Start() {
-	instSettings := FlagHandle(os.Args)
+	flagSettings := FlagHandle(os.Args)
 
 	var wg sync.WaitGroup
 
@@ -175,7 +175,7 @@ func Start() {
 	}
 
 	if fi.Mode()&os.ModeNamedPipe != 0 {
-		if instSettings.CheckFileName {
+		if flagSettings.CheckFileName {
 			fmt.Println("Error: -f in piped input")
 			os.Exit(-1)
 		}
@@ -191,36 +191,36 @@ func Start() {
 			os.Exit(-1)
 		}
 
-		instSettings.PipeInput = true
+		flagSettings.PipeInput = true
 		pipe = string(n)
 	}
 
-	if instSettings.PipeInput {
+	if flagSettings.PipeInput {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if instSettings.ReadPipeFileList {
+			if flagSettings.ReadPipeFileList {
 				for _, lineIter := range strings.Split(pipe, "\n") {
 					if len(lineIter) > 0 {
-						for _, res := range FindTextInFile(lineIter, instSettings) {
-							PrintResult(res, instSettings)
-							if instSettings.CheckFirst {
+						for _, res := range FindTextInFile(lineIter, flagSettings) {
+							PrintResult(res, flagSettings)
+							if flagSettings.CheckFirst {
 								break
 							}
 						}
 					}
 				}
 			} else {
-				for _, res := range FindTextInBuff(pipe, instSettings) {
-					PrintResult(res, instSettings)
-					if instSettings.CheckFirst {
+				for _, res := range FindTextInBuff(pipe, flagSettings) {
+					PrintResult(res, flagSettings)
+					if flagSettings.CheckFirst {
 						break
 					}
 				}
 			}
 		}()
 	} else {
-		dat, err := os.Stat(instSettings.Path)
+		dat, err := os.Stat(flagSettings.Path)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(-1)
@@ -228,23 +228,23 @@ func Start() {
 
 		switch pathType := dat.Mode(); {
 		case pathType.IsDir():
-			err := filepath.Walk(instSettings.Path,
+			err := filepath.Walk(flagSettings.Path,
 				func(pathIn string, info os.FileInfo, err error) error {
 					if err != nil {
 						return err
 					}
 
-					currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - instSettings.PathDepth - 1
+					currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - flagSettings.PathDepth - 1
 					stat, err := os.Stat(pathIn)
 					if err == nil &&
-						(((stat.Mode()&0111) == 0 || instSettings.CheckFileName) && !stat.IsDir()) && //check if path is file and not executable
-						((instSettings.LevelRest && currentPathDepth <= instSettings.LevelRestLimit) || !instSettings.LevelRest) { //check path level
+						(((stat.Mode()&0111) == 0 || flagSettings.CheckFileName) && !stat.IsDir()) && //check if path is file and not executable
+						((flagSettings.LevelRest && currentPathDepth <= flagSettings.LevelRestLimit) || !flagSettings.LevelRest) { //check path level
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
-							for _, res := range FindTextInFile(pathIn, instSettings) {
-								PrintResult(res, instSettings)
-								if instSettings.CheckFirst {
+							for _, res := range FindTextInFile(pathIn, flagSettings) {
+								PrintResult(res, flagSettings)
+								if flagSettings.CheckFirst {
 									break
 								}
 							}
@@ -262,8 +262,8 @@ func Start() {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				for _, res := range FindTextInFile(instSettings.Path, instSettings) {
-					PrintResult(res, instSettings)
+				for _, res := range FindTextInFile(flagSettings.Path, flagSettings) {
+					PrintResult(res, flagSettings)
 				}
 			}()
 		}

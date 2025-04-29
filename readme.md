@@ -7,6 +7,7 @@
 - [Usage](#usage)
 - [Features](#features)
   - [Flags](#flags)
+- [Examples](#examples)
 - [Tests](#tests)
 - [TODO](#todo)
 
@@ -52,6 +53,8 @@ cd goFind && sudo make install
 - output only path of pattern [[example]](./examples/pathOnly.sh)
 <br></br>
 - search with star-pattern [[example]](./examples/pattern.sh)
+<br></br>
+> check [Examples](#examples)
 
 ### Flags
   - `-l`:
@@ -76,6 +79,9 @@ cd goFind && sudo make install
     - removes color from output
   - `--help`:
     - shows flags and usage
+
+## Examples
+ - initialize examples with `sh ./examples/init.sh`
 
 ## Tests
  - `go test ./tests -v`

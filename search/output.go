@@ -85,9 +85,9 @@ func printLine(locationIn Location, buffer *bufio.Writer, settingsIn Settings) {
 	}
 }
 
-func PrintResult(locationIn Location, instSettings Settings) {
-	f := bufio.NewWriter(os.Stdout)
-	defer f.Flush()
+func PrintResult(locationIn Location, settingsIn Settings) {
+	buffer := bufio.NewWriter(os.Stdout)
+	defer buffer.Flush()
 
 	if len(locationIn.CharNum) < 1 {
 		return
@@ -99,33 +99,33 @@ func PrintResult(locationIn Location, instSettings Settings) {
 		os.Exit(-1)
 	}
 
-	if (!instSettings.PipeInput || instSettings.ReadPipeFileList) && instSettings.ShowInfo {
-		printPath(absPath, f, instSettings.ShowColor)
+	if (!settingsIn.PipeInput || settingsIn.ReadPipeFileList) && settingsIn.ShowInfo {
+		printPath(absPath, buffer, settingsIn.ShowColor)
 
-		if instSettings.ShowPathOnly {
-			f.Write([]byte(string("\n")))
+		if settingsIn.ShowPathOnly {
+			buffer.Write([]byte(string("\n")))
 			return
 		}
 
-		f.Write([]byte(string(":")))
+		buffer.Write([]byte(string(":")))
 
-		printLocation(locationIn, f, instSettings)
+		printLocation(locationIn, buffer, settingsIn)
 
-		f.Write([]byte(":"))
+		buffer.Write([]byte(":"))
 	}
 
-	if instSettings.ShowPathOnly {
-		if instSettings.PipeInput && !instSettings.ReadPipeFileList {
-			f.Write([]byte(string("Error: piped input has no path\n")))
+	if settingsIn.ShowPathOnly {
+		if settingsIn.PipeInput && !settingsIn.ReadPipeFileList {
+			buffer.Write([]byte(string("Error: piped input has no path\n")))
 		}
 		return
 	}
 
-	printLine(locationIn, f, instSettings)
+	printLine(locationIn, buffer, settingsIn)
 
-	if !instSettings.ShowColor {
-		f.Write([]byte("\n"))
+	if !settingsIn.ShowColor {
+		buffer.Write([]byte("\n"))
 	} else {
-		f.Write([]byte("\x1b[0m\n"))
+		buffer.Write([]byte("\x1b[0m\n"))
 	}
 }

@@ -9,10 +9,6 @@ build:
 	fi
 	$(comp) build -o $(buildPath)/$(exeName) $(inputFile)
 
-run:
-	$(MAKE) build
-	$(buildPath)/gfind "/home/lukas/code/td/" "package" -l 1 -c
-
 install:
 	$(MAKE) build -B
 	@if [ -f /usr/bin/$(exeName) ]; then\
