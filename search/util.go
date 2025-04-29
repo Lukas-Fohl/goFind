@@ -62,6 +62,11 @@ func DefaultSettings() Settings {
 func FlagHandle(args []string) Settings {
 	instSettings := DefaultSettings()
 
+	if len(args) > 1 && args[1] == "--help" {
+		PrintHelp()
+		os.Exit(-1)
+	}
+
 	if len(args) < 2 {
 		fmt.Println("Error: not enougth arguments")
 		os.Exit(-1)
@@ -101,7 +106,7 @@ func FlagHandle(args []string) Settings {
 		case "-cf":
 			instSettings.CheckFirst = true
 		case "--help":
-			fmt.Println("diddle daddle duddle")
+			PrintHelp()
 			os.Exit(-1)
 		case "-l":
 			instSettings.LevelRest = true

@@ -35,22 +35,23 @@ cd goFind && sudo make install
    - `gfind ".go" -f`
 
 ## Features
- - read from file
- - read from file name
- - read from piped input
+ - read from path [[example]](./examples/basicFind.sh)
+ - read from file name [[example]](./examples/basicFind.sh)
+ - read from piped input [[example]](./examples/pipedFind.sh)
 <br></br>
- - search recursive in dir for file content (with limit)
- - search given file-list
+ - search recursive in dir for file content (with limit) [[example]](./examples/levelFind.sh)
+ - search given file-list [[example]](./examples/fileList.sh)
 <br></br>
- - check for exact input
- - check for fuzzy input
- - check for letters in line
- - check with/with out case sensitive
- - check only for first occurrance
+ - check for exact input [[example]](./examples/basicFind.sh)
+ - check for fuzzy input [[example]](./examples/fuzzyFind.sh)
+ - check for letters in line [[example]](./examples/letterFind.sh)
+ - check with/with out case sensitive [[example]](./examples/caseFind.sh)
+ - check only for first occurrance [[example]](./examples/checkFirst.sh)
 <br></br>
-- output with and without color/info
-- output ony path of pattern
-
+- output with and without color/info [[example]](./examples/noOutputFind.sh)
+- output only path of pattern [[example]](./examples/pathOnly.sh)
+<br></br>
+- search with star-pattern [[example]](./examples/pattern.sh)
 
 ### Flags
   - `-l`:
@@ -85,7 +86,7 @@ cd goFind && sudo make install
  - [x] impl fuzzy
  - [x] impl file name search
  - [x] split file into: main, search, output
- - [ ] write docs/examples
+ - [x] write docs/examples
  - [x] build test
  - [x] check for binary file
  <br></br>
@@ -110,9 +111,9 @@ cd goFind && sudo make install
  - [ ] panic in debug?????????????
  - [x] star pattern?????????????
  - [x] eol pattern
- - [ ] rewrite output!!!!!!!!!!!!!!
+ - [x] rewrite output!!!!!!!!!!!!!!
  - [ ] error messages
- - [ ] write --help, add to Error
+ - [x] write --help, add to Error
  - [x] remove pointer to line
  - [x] double to lower?
  - [x] error when using -f in piped
