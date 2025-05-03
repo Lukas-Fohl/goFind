@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+func PrintVersion() {
+	fmt.Println("gfind v1.0")
+}
+
 func PrintHelp() {
 	fmt.Println(`
 ## Usage
@@ -47,6 +51,8 @@ func PrintHelp() {
     - removes color from output
   - "--help":
     - shows flags and usage
+  - "--version":
+    - prints version
 	`)
 }
 
@@ -116,7 +122,7 @@ func PrintResult(locationIn Location, settingsIn Settings) {
 
 	if settingsIn.ShowPathOnly {
 		if settingsIn.PipeInput && !settingsIn.ReadPipeFileList {
-			buffer.Write([]byte(string("Error: piped input has no path\n")))
+			buffer.Write([]byte(string("Error: piped input has no path. Use --help\n")))
 		}
 		return
 	}

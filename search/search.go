@@ -216,6 +216,10 @@ func FindTextInLine(line string, settingsIn Settings) (bool, []int) {
 	lenEscStar := len(strings.Split(settingsIn.SearchPattern, "\\*"))
 	lenEscEnd := len(strings.Split(settingsIn.SearchPattern, "\\~"))
 	if lenStarSplit > lenEscStar || lenEndSplit > lenEscEnd {
+		if settingsIn.CheckFuzzy || settingsIn.CheckLetters {
+			fmt.Println("Error search restriction on pattern-search. Use --help")
+			os.Exit(-1)
+		}
 		return FindRestriced(tempLine, settingsIn.SearchPattern)
 	}
 
@@ -264,7 +268,7 @@ func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 	locationList := []Location{}
 	if SettingsIn.CheckFileName {
 		if SettingsIn.CheckFirst {
-			fmt.Println("Error: check first on file-name search")
+			fmt.Println("Error: check first on file-name search. Use --help")
 			os.Exit(-1)
 		}
 

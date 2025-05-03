@@ -17,11 +17,12 @@
  - go `>=1.22.2`
 
 ## Installation
- - linux:
+ - **linux:**
 ```bash
 git clone https://github.com/Lukas-Fohl/goFind
 cd goFind && sudo make install
 ```
+ - should work on MacOs if you have /usr/local/bin/
 
 ## Usage
  - `gfind [path] [pattern] [flags]`
@@ -79,6 +80,9 @@ cd goFind && sudo make install
     - removes color from output
   - `--help`:
     - shows flags and usage
+  - `--version`:
+    - prints version
+
 
 ## Examples
  - initialize examples with `sh ./examples/init.sh`
@@ -89,13 +93,6 @@ cd goFind && sudo make install
  - check flag function behaviour with sameples
 
 ## TODO
- - [x] impl fuzzy
- - [x] impl file name search
- - [x] split file into: main, search, output
- - [x] write docs/examples
- - [x] build test
- - [x] check for binary file
- <br></br>
  - [x] file name
  - [x] fix fuzzy char index
  - [x] fix indices name to indices
@@ -112,13 +109,13 @@ cd goFind && sudo make install
  - [x] file list, check if len(string) > 0
  - [x] fix utf8 and unicode --> replace len(*line) with len(strings.Split(*line, ""))
  - [x] no tint with -po flag
- - [ ] get amount in file?????????????
- - [ ] rework flags?????????????
- - [ ] panic in debug?????????????
+ - [ ] get amount in file????????????? - no
+ - [ ] rework flags????????????? - no
+ - [ ] panic in debug????????????? - no
  - [x] star pattern?????????????
  - [x] eol pattern
  - [x] rewrite output!!!!!!!!!!!!!!
- - [ ] error messages
+ - [x] error messages
  - [x] write --help, add to Error
  - [x] remove pointer to line
  - [x] double to lower?

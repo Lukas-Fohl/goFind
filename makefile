@@ -11,7 +11,8 @@ build:
 
 install:
 	$(MAKE) build -B
-	@if [ -f /usr/bin/$(exeName) ]; then\
-		rm /usr/bin/$(exeName);\
+	@if [ -f /usr/local/bin/$(exeName) ]; then\
+		rm /usr/local/bin/$(exeName);\
 	fi
-	mv $(buildPath)/$(exeName) /usr/bin/$(exeName)
+	mv $(buildPath)/$(exeName) /usr/local/bin/$(exeName)
+

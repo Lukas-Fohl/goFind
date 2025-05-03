@@ -65,10 +65,13 @@ func FlagHandle(args []string) Settings {
 	if len(args) > 1 && args[1] == "--help" {
 		PrintHelp()
 		os.Exit(-1)
+	} else if len(args) > 1 && args[1] == "--version" {
+		PrintVersion()
+		os.Exit(-1)
 	}
 
 	if len(args) < 2 {
-		fmt.Println("Error: not enougth arguments")
+		fmt.Println("Error: not enough arguments")
 		os.Exit(-1)
 	} else {
 		//case no path is provided
@@ -107,6 +110,9 @@ func FlagHandle(args []string) Settings {
 			flagSettings.CheckFirst = true
 		case "--help":
 			PrintHelp()
+			os.Exit(-1)
+		case "--version":
+			PrintVersion()
 			os.Exit(-1)
 		case "-l":
 			flagSettings.LevelRest = true
