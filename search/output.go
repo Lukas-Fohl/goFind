@@ -69,6 +69,7 @@ func printLocation(locationIn Location, buffer *bufio.Writer, settingsIn Setting
 		if !settingsIn.CheckFileName {
 			buffer.Write([]byte(strconv.FormatInt(int64(locationIn.LineNum), 10) + ","))
 		}
+
 		buffer.Write([]byte(strconv.FormatInt(int64(locationIn.CharNum[0]), 10)))
 	} else {
 		buffer.Write([]byte(strconv.FormatInt(int64(locationIn.LineNum), 10)))
@@ -124,6 +125,7 @@ func PrintResult(locationIn Location, settingsIn Settings) {
 		if settingsIn.PipeInput && !settingsIn.ReadPipeFileList {
 			buffer.Write([]byte(string("Error: piped input has no path. Use --help\n")))
 		}
+
 		return
 	}
 

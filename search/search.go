@@ -31,6 +31,7 @@ func FindExact(line string, searchPattern string) (bool, []int) {
 			for j := 0; j < len(splitPattern); j++ {
 				returnList = append(returnList, i+j)
 			}
+
 			return true, returnList
 		}
 	}
@@ -181,6 +182,7 @@ func FindRestriced(line string, searchPattern string) (bool, []int) {
 				for _, i := range listOfFound {
 					returnList = append(returnList, i...)
 				}
+
 				return true, returnList
 			} else {
 				return false, []int{}
@@ -191,6 +193,7 @@ func FindRestriced(line string, searchPattern string) (bool, []int) {
 			for _, i := range listOfFound {
 				returnList = append(returnList, i...)
 			}
+
 			return true, returnList
 		}
 	} else {
@@ -220,6 +223,7 @@ func FindTextInLine(line string, settingsIn Settings) (bool, []int) {
 			fmt.Println("Error search restriction on pattern-search. Use --help")
 			os.Exit(-1)
 		}
+
 		return FindRestriced(tempLine, settingsIn.SearchPattern)
 	}
 
@@ -277,18 +281,21 @@ func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 		if found {
 			locationList = append(locationList, Location{Path: pathIn, Line: fileName, LineNum: 0, CharNum: index})
 		}
+
 		return locationList
 	}
 
 	dat, err := os.ReadFile(pathIn)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(-1)
 	}
 
 	if !utf8.ValidString(string(dat[len(dat)/5:])) { //check for binary-file
 		if pathIn == SettingsIn.Path {
 			fmt.Printf("%s is a binary file\n", pathIn)
 		}
+
 		return locationList
 	}
 

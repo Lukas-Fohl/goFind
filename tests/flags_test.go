@@ -11,6 +11,7 @@ func TestPath(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
 	testCases := []struct {
 		name       string
 		flagsIn    []string
@@ -173,7 +174,7 @@ func TestFlag(t *testing.T) {
 				CheckCaseSensitive: true,  //-s
 				CheckFirst:         false, //-cf
 				ShowInfo:           false, //-n
-				ShowColor:          true,  //-t
+				ShowColor:          false, //-t
 				ShowPathOnly:       false, //-po
 				PipeInput:          false,
 				ReadPipeFileList:   false, //-fl
@@ -271,6 +272,7 @@ func TestFlag(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			res := finder.FlagHandle(tc.flagsIn)
@@ -321,7 +323,6 @@ func TestFlag(t *testing.T) {
 			if res.ReadPipeFileList != tc.result.ReadPipeFileList {
 				t.Error("wrong -fl handle")
 			}
-
 		})
 	}
 }

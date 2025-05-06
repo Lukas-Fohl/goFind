@@ -12,6 +12,7 @@ func reverse(strIn string) string {
 	for i := len(strIn) - 1; i >= 0; i-- {
 		returnStr += string(strIn[i])
 	}
+
 	return returnStr
 }
 
@@ -22,6 +23,7 @@ func randomString(l int) string {
 	for i := 0; i < l; i++ {
 		bytes[i] = byte(rand.IntN(max-min) + min)
 	}
+
 	return string(bytes)
 }
 
@@ -55,9 +57,11 @@ func TestFindExact(t *testing.T) {
 			if found != tc.wantFind {
 				t.Errorf("got found=%v, want %v", found, tc.wantFind)
 			}
+
 			if len(indices) != tc.wantLen {
 				t.Errorf("got %d indices, want %d", len(indices), tc.wantLen)
 			}
+
 			if found {
 				// Check if indices are sequential
 				for i := 1; i < len(indices); i++ {

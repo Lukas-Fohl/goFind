@@ -97,6 +97,7 @@ func FlagHandle(args []string) Settings {
 			flagSettings.CheckFileName = true
 		case "-n":
 			flagSettings.ShowInfo = false
+			flagSettings.ShowColor = false
 		case "-t":
 			flagSettings.ShowColor = false
 		case "-s":
@@ -122,6 +123,7 @@ func FlagHandle(args []string) Settings {
 					fmt.Println("Error: no size provided for depth")
 					os.Exit(-1)
 				}
+
 				flagSettings.LevelRestLimit = argToInt
 				i++
 			} else {
@@ -256,6 +258,7 @@ func Start() {
 							}
 						}()
 					}
+
 					return nil
 				})
 
