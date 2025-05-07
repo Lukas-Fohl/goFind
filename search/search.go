@@ -98,7 +98,7 @@ func FindFuzzy(line string, searchPattern string) (bool, []int) {
 	return false, []int{}
 }
 
-func FindRestriced(line string, searchPattern string) (bool, []int) {
+func getPatternSplit(searchPattern string) ([]string, []string) {
 	starSplit := []string{""}
 	endSplit := []string{""}
 
@@ -121,6 +121,89 @@ func FindRestriced(line string, searchPattern string) (bool, []int) {
 			endSplit[len(endSplit)-1] += splitSearch[i]
 		}
 	}
+	return starSplit, endSplit
+}
+
+// check for findExact of parts split by '*'
+func getStarPatternIndices(line string, starSplit []string) [][]int {
+	listOfFound := [][]int{}
+
+	remainingLine := line // Keep track of the remaining part of the line
+	offset := 0           // Offset to adjust indices relative to the original string
+
+	for _, elem := range starSplit {
+		if len(elem) > 0 {
+			found, indices := FindExact(remainingLine, elem)
+			if found {
+				// Adjust indices to be relative to the original string
+				for i := range indices {
+					indices[i] += offset
+				}
+				listOfFound = append(listOfFound, indices)
+
+				// Update the remaining line and offset
+				lastMatchEnd := indices[len(indices)-1] + 1
+				remainingLine = remainingLine[lastMatchEnd-offset:]
+				offset = lastMatchEnd
+			} else {
+				return [][]int{}
+			}
+		}
+	}
+
+	//check for order
+	lastLast := -1
+	lastFirst := -1
+	for _, elem := range listOfFound {
+		if elem[0] > lastFirst && elem[len(elem)-1] > lastLast && lastLast < elem[0] {
+			lastFirst = elem[0]
+			lastLast = elem[len(elem)-1]
+		} else {
+			return [][]int{}
+		}
+	}
+
+	return listOfFound
+}
+
+// get true last position in end-check (search from right to left)
+func getEndPatternIndices(line string, starSplit []string, endSplit []string) []int {
+	elem := ""
+	if len(endSplit) > 1 && len(starSplit) > 1 {
+		elem = starSplit[len(starSplit)-1]
+	} else {
+		elem = endSplit[len(endSplit)-2]
+	}
+
+	searchLine := line
+	searchOffset := 0
+	lastOffset := 0
+	found, indices := FindExact(searchLine, elem)
+	for found {
+		tempFound, tempIndices := FindExact(searchLine[searchOffset:], elem)
+		if tempFound {
+			indices = tempIndices
+			searchOffset += tempIndices[len(tempIndices)-1] + 1
+			lastOffset = tempIndices[len(tempIndices)-1] + 1
+		} else {
+			break
+		}
+	}
+
+	searchOffset -= lastOffset
+	if !found || len(indices) == 0 {
+		return []int{}
+	} else {
+		for i := 0; i < len(indices); i++ {
+			indices[i] += searchOffset
+		}
+
+		return indices
+	}
+}
+
+func FindRestriced(line string, searchPattern string) (bool, []int) {
+	starSplit, endSplit := getPatternSplit(searchPattern)
 
 	if len(endSplit) > 2 {
 		fmt.Println("Error: to many end-symbols")
@@ -130,110 +213,29 @@ func FindRestriced(line string, searchPattern string) (bool, []int) {
 		os.Exit(-1)
 	}
 
-	//check for findExact of parts split by '*'
 	listOfFound := [][]int{}
 	if len(starSplit) > 1 {
-		remainingLine := line // Keep track of the remaining part of the line
-		offset := 0           // Offset to adjust indices relative to the original string
-
-		for _, elem := range starSplit {
-			if len(elem) > 0 {
-				found, indices := FindExact(remainingLine, elem)
-				if found {
-					// Adjust indices to be relative to the original string
-					for i := range indices {
-						indices[i] += offset
-					}
-					listOfFound = append(listOfFound, indices)
-
-					// Update the remaining line and offset
-					lastMatchEnd := indices[len(indices)-1] + 1
-					remainingLine = remainingLine[lastMatchEnd-offset:]
-					offset = lastMatchEnd
-				} else {
-					return false, []int{}
-				}
-			}
-		}
-
-		//check for order
-		lastLast := -1
-		lastFirst := -1
-		for _, elem := range listOfFound {
-			if elem[0] > lastFirst && elem[len(elem)-1] > lastLast && lastLast < elem[0] {
-				lastFirst = elem[0]
-				lastLast = elem[len(elem)-1]
-			} else {
-				return false, []int{}
-			}
-		}
-
+		listOfFound = getStarPatternIndices(line, starSplit)
 		if len(listOfFound) == 0 {
 			return false, []int{}
 		}
 	}
 
-	//get true last position in end check (search from right to left)
 	endPatternIndices := []int{}
-	if len(endSplit) > 1 && len(starSplit) > 1 {
-		searchLine := line
-		searchOffset := 0
-		lastOffset := 0
-		found, indices := FindExact(searchLine, starSplit[len(starSplit)-1])
-		for found {
-			tempFound, tempIndices := FindExact(searchLine[searchOffset:], starSplit[len(starSplit)-1])
-			if tempFound {
-				indices = tempIndices
-				searchOffset += tempIndices[len(tempIndices)-1] + 1
-				lastOffset = tempIndices[len(tempIndices)-1] + 1
-			} else {
-				break
-			}
-		}
-
-		searchOffset -= lastOffset
-		if !found || len(indices) == 0 {
+	if (len(endSplit) > 1 && len(starSplit) > 1) || len(endSplit) > 1 {
+		endPatternIndices = getEndPatternIndices(line, starSplit, endSplit)
+		if len(endPatternIndices) == 0 {
 			return false, []int{}
-		} else {
-			for i := 0; i < len(indices); i++ {
-				indices[i] += searchOffset
-			}
-
-			endPatternIndices = indices
-		}
-	} else if len(endSplit) > 1 {
-		searchLine := line
-		searchOffset := 0
-		lastOffset := 0
-		found, indices := FindExact(searchLine, endSplit[len(endSplit)-2])
-		for found {
-			tempFound, tempIndices := FindExact(searchLine[searchOffset:], endSplit[len(endSplit)-2])
-			if tempFound {
-				indices = tempIndices
-				searchOffset += tempIndices[len(tempIndices)-1] + 1
-				lastOffset = tempIndices[len(tempIndices)-1] + 1
-			} else {
-				break
-			}
-		}
-		searchOffset -= lastOffset
-
-		if !found || len(indices) == 0 {
-			return false, []int{}
-		} else {
-			for i := 0; i < len(indices); i++ {
-				indices[i] += searchOffset
-			}
-			endPatternIndices = indices
 		}
 	}
 
+	//return logic
 	if len(starSplit) > 1 {
 		if len(endSplit) > 1 {
 			if endPatternIndices[len(endPatternIndices)-1] == len(line)-1 {
 				//concat list
 				returnList := []int{}
-				for _, i := range listOfFound[:len(listOfFound)-1] { //all but last last element
+				for _, i := range listOfFound[:len(listOfFound)-1] { //all but last element
 					returnList = append(returnList, i...)
 				}
 				returnList = append(returnList, endPatternIndices...)
