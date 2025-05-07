@@ -173,15 +173,70 @@ func FindRestriced(line string, searchPattern string) (bool, []int) {
 		}
 	}
 
+	//get true last position in end check (search from right to left)
+	endPatternIndices := []int{}
+	if len(endSplit) > 1 && len(starSplit) > 1 {
+		searchLine := line
+		searchOffset := 0
+		lastOffset := 0
+		found, indices := FindExact(searchLine, starSplit[len(starSplit)-1])
+		for found {
+			tempFound, tempIndices := FindExact(searchLine[searchOffset:], starSplit[len(starSplit)-1])
+			if tempFound {
+				indices = tempIndices
+				searchOffset += tempIndices[len(tempIndices)-1] + 1
+				lastOffset = tempIndices[len(tempIndices)-1] + 1
+			} else {
+				break
+			}
+		}
+
+		searchOffset -= lastOffset
+		if !found || len(indices) == 0 {
+			return false, []int{}
+		} else {
+			for i := 0; i < len(indices); i++ {
+				indices[i] += searchOffset
+			}
+
+			endPatternIndices = indices
+		}
+	} else if len(endSplit) > 1 {
+		searchLine := line
+		searchOffset := 0
+		lastOffset := 0
+		found, indices := FindExact(searchLine, endSplit[len(endSplit)-2])
+		for found {
+			tempFound, tempIndices := FindExact(searchLine[searchOffset:], endSplit[len(endSplit)-2])
+			if tempFound {
+				indices = tempIndices
+				searchOffset += tempIndices[len(tempIndices)-1] + 1
+				lastOffset = tempIndices[len(tempIndices)-1] + 1
+			} else {
+				break
+			}
+		}
+		searchOffset -= lastOffset
+
+		if !found || len(indices) == 0 {
+			return false, []int{}
+		} else {
+			for i := 0; i < len(indices); i++ {
+				indices[i] += searchOffset
+			}
+			endPatternIndices = indices
+		}
+	}
+
 	if len(starSplit) > 1 {
 		if len(endSplit) > 1 {
-			lastElem := listOfFound[len(listOfFound)-1][len(listOfFound[len(listOfFound)-1])-1]
-			if lastElem == len(line)-1 {
+			if endPatternIndices[len(endPatternIndices)-1] == len(line)-1 {
 				//concat list
 				returnList := []int{}
-				for _, i := range listOfFound {
+				for _, i := range listOfFound[:len(listOfFound)-1] { //all but last last element
 					returnList = append(returnList, i...)
 				}
+				returnList = append(returnList, endPatternIndices...)
 
 				return true, returnList
 			} else {
@@ -198,7 +253,9 @@ func FindRestriced(line string, searchPattern string) (bool, []int) {
 		}
 	} else {
 		found, indices := FindExact(line, endSplit[0])
-		if found && indices[len(indices)-1] == len(line)-1 {
+		if found && len(endPatternIndices) > 0 && endPatternIndices[len(endPatternIndices)-1] == len(line)-1 {
+			return found, endPatternIndices
+		} else if found && len(indices) > 0 && indices[len(indices)-1] == len(line)-1 {
 			return found, indices
 		} else {
 			return false, []int{}

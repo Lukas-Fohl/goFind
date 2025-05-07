@@ -83,7 +83,6 @@ cd goFind && sudo make install
   - `--version`:
     - prints version
 
-
 ## Examples
  - initialize examples with `sh ./examples/init.sh`
 

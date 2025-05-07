@@ -210,6 +210,13 @@ func Start() {
 			if flagSettings.ReadPipeFileList {
 				for _, lineIter := range strings.Split(pipe, "\n") {
 					if len(lineIter) > 0 {
+						absPath, err := filepath.Abs(lineIter)
+						if err != nil {
+							fmt.Println(err)
+							os.Exit(-1)
+						}
+
+						lineIter = absPath
 						for _, res := range FindTextInFile(lineIter, flagSettings) {
 							PrintResult(res, flagSettings)
 							if flagSettings.CheckFirst {

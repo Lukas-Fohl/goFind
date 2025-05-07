@@ -317,6 +317,27 @@ func TestFindResticted(t *testing.T) {
 			wantFind: true,
 			wantLen:  7,
 		},
+		{
+			name:     "end pattern + star in text not at end",
+			text:     "package tests",
+			pattern:  "pac*t*s~",
+			wantFind: true,
+			wantLen:  5,
+		},
+		{
+			name:     "end pattern in text not at end",
+			text:     "package tests",
+			pattern:  "s~",
+			wantFind: true,
+			wantLen:  1,
+		},
+		{
+			name:     "mismatch end test",
+			text:     "package tests",
+			pattern:  "st~",
+			wantFind: false,
+			wantLen:  0,
+		},
 	}
 
 	for _, tc := range testCases {
