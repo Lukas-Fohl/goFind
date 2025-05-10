@@ -77,8 +77,7 @@ func FlagHandle(args []string) Settings {
 		//case no path is provided
 		pathOut, err := os.Getwd()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(-1)
+			panic(err)
 		}
 
 		flagSettings.Path = pathOut
@@ -138,8 +137,7 @@ func FlagHandle(args []string) Settings {
 
 				fi, err := os.Stdin.Stat()
 				if err != nil {
-					fmt.Println(err)
-					os.Exit(-1)
+					panic(err)
 				}
 
 				if len(args[i]) > 0 && args[i][0] == '-' {
@@ -160,8 +158,7 @@ func FlagHandle(args []string) Settings {
 
 	absPath, err := filepath.Abs(flagSettings.Path)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		panic(err)
 	}
 
 	flagSettings.Path = absPath
@@ -178,8 +175,7 @@ func Start() {
 	var pipe string
 	fi, err := os.Stdin.Stat()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		panic(err)
 	}
 
 	if fi.Mode()&os.ModeNamedPipe != 0 {
@@ -190,8 +186,7 @@ func Start() {
 
 		n, err := io.ReadAll(os.Stdin)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(-1)
+			panic(err)
 		}
 
 		if !utf8.ValidString(string(n)) {
@@ -212,8 +207,7 @@ func Start() {
 					if len(lineIter) > 0 {
 						absPath, err := filepath.Abs(lineIter)
 						if err != nil {
-							fmt.Println(err)
-							os.Exit(-1)
+							panic(err)
 						}
 
 						lineIter = absPath
@@ -237,8 +231,7 @@ func Start() {
 	} else {
 		dat, err := os.Stat(flagSettings.Path)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(-1)
+			panic(err)
 		}
 
 		switch pathType := dat.Mode(); {
@@ -246,7 +239,7 @@ func Start() {
 			err := filepath.Walk(flagSettings.Path,
 				func(pathIn string, info os.FileInfo, err error) error {
 					if err != nil {
-						return err
+						return nil //not break on wrong permission !TODO
 					}
 
 					currentPathDepth := strings.Count(path.Join(pathIn), string(os.PathSeparator)) - flagSettings.PathDepth - 1
@@ -270,8 +263,7 @@ func Start() {
 				})
 
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(-1)
+				panic(err)
 			}
 
 		case pathType.IsRegular():

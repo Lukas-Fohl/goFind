@@ -102,8 +102,7 @@ func PrintResult(locationIn Location, settingsIn Settings) {
 
 	absPath, err := filepath.Abs(locationIn.Path)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		panic(err)
 	}
 
 	if (!settingsIn.PipeInput || settingsIn.ReadPipeFileList) && settingsIn.ShowInfo {

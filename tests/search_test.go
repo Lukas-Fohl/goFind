@@ -438,7 +438,6 @@ func TestFindFuzzyProp(t *testing.T) {
 	}
 }
 
-/*
 func TestCaseSearch(t *testing.T) {
 	testCases := []struct {
 		name     string
@@ -453,11 +452,16 @@ func TestCaseSearch(t *testing.T) {
 				LevelRest:          false, //-l
 				LevelRestLimit:     -1,
 				CheckLetters:       false, //-i
-				CheckFuzzy:         false, //-c
-				CheckNormal:        true,
+				CheckFuzzy:         true, //-c
+				CheckNormal:        false,
 				CheckFileName:      false, //-f
 				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          true,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "test",
@@ -471,14 +475,65 @@ func TestCaseSearch(t *testing.T) {
 				LevelRest:          false, //-l
 				LevelRestLimit:     -1,
 				CheckLetters:       false, //-i
-				CheckFuzzy:         false, //-c
-				CheckNormal:        true,
+				CheckFuzzy:         true, //-c
+				CheckNormal:        false,
 				CheckFileName:      false, //-f
-				CheckCaseSensitive: false, //-s
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
 				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          true,
+				ReadPipeFileList:   false, //-fl
 				PathDepth:          0,
 				Path:               "",
 				SearchPattern:      "test",
+			},
+			result: true,
+		},
+		{
+			name: "found lower fuzzy",
+			line: "TEST",
+			settings: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       false, //-i
+				CheckFuzzy:         true, //-c
+				CheckNormal:        false,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
+				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          true,
+				ReadPipeFileList:   false, //-fl
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "tst",
+			},
+			result: true,
+		},
+		{
+			name: "found lower in line",
+			line: "ABCDEFGHIJKLMNOP",
+			settings: finder.Settings{
+				LevelRest:          false, //-l
+				LevelRestLimit:     -1,
+				CheckLetters:       true, //-i
+				CheckFuzzy:         false, //-c
+				CheckNormal:        false,
+				CheckFileName:      false, //-f
+				CheckCaseSensitive: true,  //-s
+				CheckFirst:         false, //-cf
+				ShowInfo:           true,  //-n
+				ShowColor:          true,  //-t
+				ShowPathOnly:       false, //-po
+				PipeInput:          true,
+				ReadPipeFileList:   false, //-fl
+				PathDepth:          0,
+				Path:               "",
+				SearchPattern:      "afg",
 			},
 			result: true,
 		},
@@ -486,22 +541,12 @@ func TestCaseSearch(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			c := make(chan finder.Location)
-			var wg sync.WaitGroup
-			wg.Add(1)
-			go finder.FindTextInBuff(&tc.line, tc.settings, c, &wg)
-
-			go func() {
-				wg.Wait()
-				close(c)
-			}()
-
-			for msg := range c {
-				if (len(msg.CharNum) != 0) != tc.result {
+			locations := finder.FindTextInBuff(tc.line, tc.settings)
+			for _, elem := range(locations) {
+				if (len(elem.CharNum) != 0) != tc.result {
 					t.Error("wrong reuslt in case sensitive test")
 				}
 			}
 		})
 	}
 }
-*/

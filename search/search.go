@@ -279,7 +279,7 @@ func FindTextInLine(line string, settingsIn Settings) (bool, []int) {
 	lenEscEnd := len(strings.Split(settingsIn.SearchPattern, "\\~"))
 	if lenStarSplit > lenEscStar || lenEndSplit > lenEscEnd {
 		if settingsIn.CheckFuzzy || settingsIn.CheckLetters {
-			fmt.Println("Error search restriction on pattern-search. Use --help")
+			fmt.Println("Error: search restriction on pattern-search. Use --help")
 			os.Exit(-1)
 		}
 
@@ -346,8 +346,8 @@ func FindTextInFile(pathIn string, SettingsIn Settings) []Location {
 
 	dat, err := os.ReadFile(pathIn)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		panic(err)
+		//return locationList
 	}
 
 	if !utf8.ValidString(string(dat[len(dat)/5:])) { //check for binary-file
