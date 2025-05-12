@@ -14,8 +14,8 @@ func PrintVersion() {
 }
 
 func PrintHelp() {
+	fmt.Print("\x1b[1mUsage\x1b[0m")
 	fmt.Println(`
-## Usage
  - gfind [path] [pattern] [flags]
  - gfind [file] [pattern] [flags]
  - gfind [pattern] [flags] (assumes current path)
@@ -26,9 +26,9 @@ func PrintHelp() {
    - gfind "start" -s -l 0
    - cat main.go | gfind "package"
    - gfind ".go" -f
-	`)
+    `)
+	fmt.Print("\x1b[1mFlags\x1b[0m")
 	fmt.Println(`
-### Flags
   - "-l <number>":
     - level depth of file tree search
   - "-f":
@@ -40,7 +40,7 @@ func PrintHelp() {
   - "-s":
     - not case sensitive
   - "-fl":
-    - assumes input to be list of file-paths from stdin and searches those for a given patern (only works with piped input)
+    - assumes input to be list of file-paths from stdin and searches those for a given pattern (only works with piped input)
   - "-po":
     - prints only path of the result
   - "cf":
@@ -53,7 +53,7 @@ func PrintHelp() {
     - shows flags and usage
   - "--version":
     - prints version
-	`)
+    `)
 }
 
 func printPath(pathIn string, buffer *bufio.Writer, color bool) {

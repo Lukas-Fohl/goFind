@@ -64,10 +64,10 @@ func FlagHandle(args []string) Settings {
 
 	if len(args) > 1 && args[1] == "--help" {
 		PrintHelp()
-		os.Exit(-1)
+		os.Exit(0)
 	} else if len(args) > 1 && args[1] == "--version" {
 		PrintVersion()
-		os.Exit(-1)
+		os.Exit(0)
 	}
 
 	if len(args) < 2 {
@@ -110,16 +110,17 @@ func FlagHandle(args []string) Settings {
 			flagSettings.CheckFirst = true
 		case "--help":
 			PrintHelp()
-			os.Exit(-1)
+			os.Exit(0)
 		case "--version":
 			PrintVersion()
-			os.Exit(-1)
+			os.Exit(0)
 		case "-l":
 			flagSettings.LevelRest = true
 			if i < len(args)-1 {
 				argToInt, err := strconv.Atoi(args[i+1])
 				if err != nil {
 					fmt.Println("Error: no size provided for depth")
+					fmt.Println("Use --help")
 					os.Exit(-1)
 				}
 
@@ -127,6 +128,7 @@ func FlagHandle(args []string) Settings {
 				i++
 			} else {
 				fmt.Println("Error: no size provided for depth")
+				fmt.Println("Use --help")
 				os.Exit(-1)
 			}
 		default:
@@ -142,6 +144,7 @@ func FlagHandle(args []string) Settings {
 
 				if len(args[i]) > 0 && args[i][0] == '-' {
 					fmt.Println("Error: flag not found: " + args[i])
+					fmt.Println("Use --help")
 					os.Exit(-1)
 				}
 
@@ -151,6 +154,7 @@ func FlagHandle(args []string) Settings {
 				}
 			} else {
 				fmt.Println("Error: flag not found: " + args[i])
+				fmt.Println("Use --help")
 				os.Exit(-1)
 			}
 		}
@@ -180,7 +184,7 @@ func Start() {
 
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		if flagSettings.CheckFileName {
-			fmt.Println("Error: -f in piped input")
+			fmt.Println("Error: -f in piped input. Use --help")
 			os.Exit(-1)
 		}
 
@@ -239,6 +243,7 @@ func Start() {
 			err := filepath.Walk(flagSettings.Path,
 				func(pathIn string, info os.FileInfo, err error) error {
 					if err != nil {
+						fmt.Println(err)
 						return nil //not break on wrong permission !TODO
 					}
 

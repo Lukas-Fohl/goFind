@@ -69,7 +69,7 @@ cd goFind && sudo make install
   - `-s`:
     - not case sensitive
   - `-fl`:
-    - assumes input to be list of file-paths from stdin and searches those for a given patern (only works with piped input)
+    - assumes input to be list of file-paths from stdin and searches those for a given pattern (only works with piped input)
   - `-po`:
     - prints only path of the result
   - `cf`:
