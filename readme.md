@@ -48,9 +48,9 @@ cd goFind && sudo make install
  - check for fuzzy input [[example]](./examples/fuzzyFind.sh)
  - check for letters in line [[example]](./examples/letterFind.sh)
  - check with/with out case sensitive [[example]](./examples/caseFind.sh)
- - check only for first occurrance [[example]](./examples/checkFirst.sh)
+ - check only for first occurrence [[example]](./examples/checkFirst.sh)
 <br></br>
-- output with and without color/info [[example]](./examples/noOutputFind.sh)
+- output with and with out color/info [[example]](./examples/noOutputFind.sh)
 - output only path of pattern [[example]](./examples/pathOnly.sh)
 <br></br>
 - search with star-pattern [[example]](./examples/pattern.sh)
@@ -89,7 +89,7 @@ cd goFind && sudo make install
 ## Tests
  - `go test ./tests -v`
  - for each search
- - check flag function behaviour with sameples
+ - check flag function behaviour with samples
 
 ## TODO
  - [ ] get amount in file????????????? - no
